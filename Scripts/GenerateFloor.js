@@ -34,6 +34,7 @@ function randomIntInRange(min, max) {
     return Math.floor(v * span) + min;
 }
 
+
 /**
  * An object that defines, models and generates sets of tiles with mazes.
  * @param num_rows
@@ -130,7 +131,9 @@ TileSet.prototype.generateBinaryTreeMaze = function () {
     j = 2 * randomIntInRange(0, width / 3) + 1;
     this.map[i][0] = ENTRANCE;
     this.map[0][j] = EXIT;
-    this.drawTiles(context, TILE_SIZE);
+    return drawTiles(context, TILE_SIZE);
+
+
 };
 /**
  * Choose an element in a given path, based on the selectPathAs
@@ -348,7 +351,7 @@ function doMaze() {
     tileSet.generateMaze();
 }
 
-window.onload = function () {
+/**window.onload = function () {
     "use strict";
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
@@ -356,5 +359,5 @@ window.onload = function () {
     canvas.height = NUM_ROWS * TILE_SIZE;
     document.getElementById("go").onclick = doMaze;
     tileSet = new TileSet(NUM_ROWS, NUM_COLS);
-    tileSet.loadTiles(".../Assets/tileset.png");
-};
+    tileSet.loadTiles("../Assets/tileset.png");
+};**/
