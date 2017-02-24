@@ -1,0 +1,22 @@
+ if (keyUp.isDown)
+            {
+                DebugCount++;
+                DebugText.setText("You got to point" + DebugCount + "!");
+                PC.y = PC.y - 100;
+            }
+            else if (keyDown.isDown)
+            {
+                PC.y++;
+            }
+
+            if (keyLeft.isDown)
+            {
+                PC.x--;
+            }
+            else if (keyRight.isDown)
+            {
+                PC.x++;
+            }
+            
+            DebugCount++;
+            DebugText.setText("You got to point" + DebugCount + "!");
