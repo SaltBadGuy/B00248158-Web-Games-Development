@@ -1,0 +1,693 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dungeon Haul</title>
+        <script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.min.js"></script>
+        <!--<script src="Scripts/GenerateFloor.js" type="text/javascript"></script>-->
+        <script src="Scripts/Protos.js" type="text/javascript"></script>
+        <script src="Scripts/Combat.js" type="text/javascript"></script>
+        <script src="Scripts/HUDUpdate.js" type="text/javascript"></script>
+    </head>
+    <body>
+
+    <!--<canvas id="canvas" width="800" height="600" style="border:solid;">
+        Canvas is not supported on this browser.
+    </canvas>
+    <br/>
+    <label for="width">Width</label><input id="width" type="number" size="2"/>
+    <label for="height">Height</label><input id="height" type="number" size="2"/>
+    <select id="algorithm">
+        <option value="bin">Binary Tree</option>
+        <option value="gr1">Growing Tree (Last Path Node)</option>
+        <option value="gr2">Growing Tree (Random Path Node)</option>
+    </select>
+    <button id="go">Go</button> -->
+
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+
+
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+
+        /**canvas = document.getElementById("canvas");
+         context = canvas.getContext("2d");
+         canvas.width = NUM_COLS * TILE_SIZE;
+         canvas.height = NUM_ROWS * TILE_SIZE;
+         document.getElementById("go").onclick = doMaze;
+         tileSet = new TileSet(NUM_ROWS, NUM_COLS);
+         tileSet.loadTiles("./Assets/tileset.png");*/
+
+
+        function preload () {
+            //Sprites
+            //Player character sprite
+            game.load.image('DHPC', 'Assets/DHPC.png');
+            //Floor tile sprite
+            game.load.image('DHFloor', 'Assets/DHFloor.png');
+            //Floor tile sprite
+            game.load.image('DHWall', 'Assets/DHStoneWall1.png');
+            //Wall tile sprite
+            game.load.image('DHChest', 'Assets/DHChest.png');
+            //Loot sprite
+            game.load.image('DHEnemy', 'Assets/DHSkeleton.png');
+            //Staircase sprite
+            game.load.image('DHStaircase', 'Assets/DHStairs.png');
+            //Scripts
+            //Maze generation script
+            //game.load.script('tileset.js', 'Scripts/tileset.js')
+
+        }
+        
+        //Used for keyboard controls
+        var keyUp;
+        var keyDown;
+        var keyLeft;
+        var keyRight;
+        var keyJ;
+        var keyK;
+        var keyL;
+        var keyM;
+        var keyC;
+
+
+        //Player character and its stats
+        var PC;
+        var PCCURHP;
+        var PCMAXHP;
+        var PCSTR;
+        var PCPATK;
+        var PCPDEF;
+        var PrevMAXHP;
+        var EnemyHP;
+
+
+        var PBurn;
+        var EBurn;
+
+        //Enemy and its stats
+
+        var enemy;
+        var enemies;
+
+
+        var DebugCount;
+
+        //TODO: Fully implement separate JS Hudupdate, sticking to including it in index.html for now
+        var HudText = function () {
+            //Used to display the player's stats
+            //Displays the player's current health and max health
+            this.PCHPText = game.add.text(100, 30, "HP = " + PC.PCCURHP + "/" + PCMAXHP + ".", {
+                font: "24px Arial",
+                fill: "#f8edff",
+                align: "center"
+            });
+            this.PCHPText.anchor.setTo(0.5, 0.5);
+            //Displays the player's strength
+            this.PCSTRText = game.add.text(100, 60, "STR = " + PC.PCSTR + ".", {
+                font: "24px Arial",
+                fill: "#ff0019",
+                align: "center"
+            });
+            this.PCSTRText.anchor.setTo(0.5, 0.5);
+
+            //Displays the player's physical attack
+            this.PCPATKText = game.add.text(100, 90, "ATK = " + PC.PCPATK + ".", {
+                font: "24px Arial",
+                fill: "#ff7000",
+                align: "center"
+            });
+            this.PCPATKText.anchor.setTo(0.5, 0.5);
+            //Displays the player's physical defence
+            this.PCPDEFText = game.add.text(100, 120, "DEF = " + PC.PCPDEF + ".", {
+                font: "24px Arial",
+                fill: "#ffd100",
+                align: "center"
+            });
+            this.PCPDEFText.anchor.setTo(0.5, 0.5);
+            this.EnemyHP = game.add.text(400, 475, "Enemy HP is " + enemy.ENHP, {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            this.PCHPText.anchor.setTo(0.5, 0.5);
+
+
+        };
+
+        var PCHeadEquip;
+        var PCChestEquip;
+        var PCWeaponEquip;
+
+        var PCHeadEquipText;
+        var PCChestEquipText;
+        var PCWeaponEquipText;
+
+        var Parry;
+        var Lifesteal;
+        var Burn;
+        var Critical;
+
+
+        var counter = 0;
+        var text = 0;
+
+        var GridArr = [
+            [1, 2],
+            [3, 4],
+            [5, 6],
+            [7, 8],
+            [9, 10],
+            [11, 12],
+            [13, 14],
+            [15, 16],
+            [17, 18],
+            [19, 20],
+            [21, 22],
+            [23, 24],
+            [25, 26],
+            [27, 28],
+            [29, 30],
+            [31, 32],
+
+
+        ];
+
+        var Turn;
+        var timerEvents = [];
+
+
+        function create () {
+
+            //Plugin initialization
+
+            //Physics system, used for player movement, collision detection and is planned to be used for particles 
+
+            DebugCount = 0;
+
+            //PC stat block
+
+            FloorGeneration();
+
+            //Player character creation
+            PC = new PCCharProto(game);
+            PC.pcsprite.anchor.setTo(0.5, 0.5);
+            PC.pcsprite.scale.setTo(2, 2);
+            console.log("PCHP" + PC.PCCURHP);
+
+
+            enemy = GenerateEnemy(enemy);
+            console.log(enemy.ENHP);
+
+            enemies = game.add.group();
+            //enemies.add(enemy);
+
+            Turn = true;
+
+            var combatTimer = this.game.time.create(true);
+
+
+
+
+            //PC ITEMSTAT BLOCK
+            //Creates a prototype for all equipment. All equipment will be based off this.
+            //@constructor
+            //@param Quality(Param): Comes in 4 qualities (Common, Enchanted, Masterpiece, Mythical. These give modifiers to item stat rolls.
+            //@param GotEquip(Param): Is used to show that no actual equipment has been found yet. This will only be true until the player picks up an equip for that slot
+            //@param PCSTRStat(Param): Is the amount of STR the item grants.
+            //@param Passive1(Param): Is the passive that the item grants. For the full game, items can roll several passives. Follows the convention "Passive X(%)"
+            //@param Passive1X(Param): Is the value given to X in passives ie. Passive1(Lifesteal X%) and Passive1X(5) gives Lifesteal 5%
+
+
+                //Creates a PCHeadEquip (A helmet)
+                PCHeadEquip = new PCEquipProto;
+
+                //Creates a PCChestEquip (A chestplate)
+                PCChestEquip = new PCEquipProto;
+
+                //Creates a PCWeaponEquip (A chestplate)
+                PCWeaponEquip = new PCEquipProto;
+
+            //PASSIVE BLOCK
+            //Creates a prototype for all passives. All passives will be based of this.
+            //PassiveMod: Multiplies the result from a roll. Strong passives (particularly percentage based ones) will have low Passive mods to keep the X Values manageable
+               Passive = {PassiveMod: 1, XModifies: "Plus"};
+
+               Lifesteal = Passive;
+               Lifesteal.PassiveMod = 1;
+
+
+
+            game.stage.backgroundColor = '#000000';
+            game.physics.startSystem(Phaser.Physics.Arcade);
+
+            
+            //tileset.js.doMaze();
+            
+            //Displays the player's current health and max health
+            PCHPText = game.add.text(100, 30, "HP = " + PC.PCCURHP + "/" + PCMAXHP + ".", {
+                font: "24px Arial",
+                fill: "#f8edff",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+            //Displays the player's strength
+            PCSTRText = game.add.text(100, 60, "STR = " + PC.PCSTR + ".", {
+                font: "24px Arial",
+                fill: "#ff0019",
+                align: "center"
+            });
+            PCSTRText.anchor.setTo(0.5, 0.5);
+
+            //Displays the player's physical attack
+            PCPATKText = game.add.text(100, 90, "ATK = " + PC.PCPATK + ".", {
+                font: "24px Arial",
+                fill: "#ff7000",
+                align: "center"
+            });
+            PCPATKText.anchor.setTo(0.5, 0.5);
+
+            //Displays the player's physical defence
+            PCPDEFText = game.add.text(100, 120, "DEF = " + PC.PCPDEF + ".", {
+                font: "24px Arial",
+                fill: "#ffd100",
+                align: "center"
+            });
+            PCPDEFText.anchor.setTo(0.5, 0.5);
+
+            //Displays the stats of the player's head equipment (if any). Defaults to not wearing anything
+            PCHeadEquipText = game.add.text(50, 500, "You have no helmet equipped.", {
+                font: "12px Arial",
+                fill: "#008dff",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+            //Displays the stats of the player's chest equipment (if any). Defaults to not wearing anything
+            PCChestEquipText = game.add.text(50, 525, "You have no chestplate equipped.", {
+                font: "12px Arial",
+                fill: "#008dff",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+
+            //Displays the stats of the player's weapon equipment (if any). Defaults to not wearing anything
+            PCWeaponEquipText = game.add.text(50, 550, "You have no weapon equipped.", {
+                font: "12px Arial",
+                fill: "#008dff",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+
+            //TODO: ENEMY STAT SCREEN
+            var CHECKTHISGUY = enemies.getFirstAlive();
+
+            EnemyHP = game.add.text(400, 475, "Enemy HP is " + enemy.ENHP, {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+            //Displays the stats of the player's head equipment (if any). Defaults to not wearing anything
+            EnemyPassive = game.add.text(400, 450, "Enemy Passive is " + enemy.Passive1 + " " + enemy.Passive1X + "%", {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+            EnemySTR = game.add.text(400, 500, "Enemy STR is " + enemy.ENSTR, {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+
+            EnemyATK = game.add.text(400, 525, "Enemy ATK is " + enemy.ENPATK, {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+            EnemyDEF = game.add.text(400, 550, "Enemy DEF is " + enemy.ENPDEF, {
+                font: "24px Arial",
+                fill: "#02ff00",
+                align: "center"
+            });
+            PCHPText.anchor.setTo(0.5, 0.5);
+            console.log("PCCURHP at the end of creation is " + PC.PCCURHP);
+            console.log("PCMAXHP at the end of creation is " + PC.PCMAXHP);
+            console.log("PCSTR at the start of creation is " + PC.PCSTR);
+            console.log("PCPATK at the start of creation is " + PC.PCPATK);
+            console.log("PCPDEF at the start of creation is " + PC.PCPDEF);
+            /**
+             * Enemy Character Creation
+             */
+            //Enemy = new EnemyProto(); //game.add.sprite(100, 100, 'DHEnemy');
+            //Enemy.anchor.setTo(0.5, 0.5);
+
+            
+            //Enable physics for the player, this is what is used to let him move and gain a hitbox for collision detection
+            
+            game.physics.arcade.enable(PC);
+
+
+            //Capture input for controlling player.
+            //NOTE: This captures the initial press of the key. This is intended as the movement is grid-based and this prevents players from accidentally moving more squares than they need to.
+            keyUp = game.input.keyboard.addKey(Phaser.Keyboard.W);
+            keyUp.onDown.add(PCMoveUp, this);
+
+            keyDown = game.input.keyboard.addKey(Phaser.Keyboard.S);
+            keyDown.onDown.add(PCMoveDown, this);
+
+            keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.A);
+            keyLeft.onDown.add(PCMoveLeft, this);
+            
+            keyRight = game.input.keyboard.addKey(Phaser.Keyboard.D);
+            keyRight.onDown.add(PCMoveRight, this);
+
+            //Capture input for debug purposes
+            //Equipping test helmet
+            keyJ = game.input.keyboard.addKey(Phaser.Keyboard.J);
+            keyJ.onDown.add(EquipTestHelmet, this);
+
+            //Equipping test helmet
+            keyK = game.input.keyboard.addKey(Phaser.Keyboard.K);
+            keyK.onDown.add(EquipTestChestPlate, this);
+
+            //Equipping test helmet
+            keyL = game.input.keyboard.addKey(Phaser.Keyboard.L);
+            keyL.onDown.add(EquipTestWeapon, this);
+
+            //Deal damage to player
+            keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
+            keyM.onDown.add(HurtPlayer, this);
+
+            //Deal damage to play
+            keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
+            keyC.onDown.add(TestCombat, this);
+
+
+            
+            game.input.keyboard.removeKeyCapture(Phaser.Keyboard.W);
+            game.input.keyboard.removeKeyCapture(Phaser.Keyboard.S);
+            game.input.keyboard.removeKeyCapture(Phaser.Keyboard.A);
+            game.input.keyboard.removeKeyCapture(Phaser.Keyboard.D);
+            game.input.keyboard.removeKeyCapture(Phaser.Keyboard.J);
+
+            PCHeadEquip = new PCEquipProto(game, 1, false, 0, "N/A", "N/A");
+            PCChestEquip = new PCEquipProto(game, 1, false, 0, "N/A", "N/A");
+            PCWeaponEquip = new PCEquipProto(game, 1, false, 0, "N/A", "N/A");
+
+            var PCPassives = ["N/A", "N/A", "N/A"];
+
+            //text = game.add.text(700, 30, 'Time: 0', { font: "32px Arial", fill: "#ffffff", align: "center" });
+            //.anchor.setTo(0.5, 0.5);
+
+
+
+        }
+        
+        
+        function update () {
+
+            //Save the MAXHP at the start of the step before any changes are made
+            PrevMAXHP = PC.PCMAXHP;
+            //console.log(PC.PCCURHP);
+            //Updates all stats
+            PC.PCSTR = PC.BasePCSTR + PCHeadEquip.PCSTRStat + PCChestEquip.PCSTRStat + PCWeaponEquip.PCSTRStat;
+
+            //Refers to the player's physical attack. Is increased by Strength in the current prototype and has a base value of 20.
+            PC.PCPATK = Math.floor(20 + (0.2 * PC.PCSTR));
+            PC.PCPDEF = Math.floor(5 + (0.1 * PC.PCSTR));
+
+            PC.PCMAXHP = Math.floor(100 + (0.5 * PC.PCSTR));
+
+            //If the player's current HP exceeds the max HP, cut it down to the max HP
+            if (PC.PCCURHP > PC.PCMAXHP){
+                console.log("Max HP exceeded, cutting down current HP");
+                PC.PCCURHP = PC.PCMAXHP;
+            }
+
+            //Check if the MAXHP has changed during this step and if the player was at full health before update the CURHP to match the new MAXHP
+            if (PC.PCMAXHP != PrevMAXHP) {
+                if (PC.PCCURHP == PrevMAXHP) {
+                    PC.PCCURHP = PC.PCMAXHP;
+                    console.log("Player was at full health before, matching their hp to their new maximum");
+                }
+            }
+
+
+            PCHPText.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
+
+            //console.log(PCHPText.text)
+           
+            PCSTRText.setText("STR = " + PC.PCSTR);
+            
+            PCPATKText.setText("ATK = " + PC.PCPATK);
+
+            PCPDEFText.setText("DEF = " + PC.PCPDEF);
+
+            EnemyHP.setText("Enemy HP is " + enemy.ENHP);
+
+            //Display the stats of your equipment (if they are equipped)
+            //Helmet text display
+            if (PCHeadEquip.GotEquip == true) {
+                PCHeadEquipText.setText("Your helmet gives you " + PCHeadEquip.PCSTRStat + " STR and " + PCHeadEquip.Passive1 + " " + PCHeadEquip.Passive1X + "%");
+            }
+            else{
+                PCHeadEquipText.setText("You have no helmet equipped.")
+            }
+            //Chestplate text display
+            if (PCChestEquip.GotEquip == true) {
+                PCChestEquipText.setText("Your chestplate gives you " + PCChestEquip.PCSTRStat + " STR and " + PCChestEquip.Passive1 + " " + PCChestEquip.Passive1X + "%");
+            }
+            else{
+                PCChestEquipText.setText("You have no chestplate equipped.")
+            }
+            //Weapon text display
+            if (PCWeaponEquip.GotEquip == true) {
+                PCWeaponEquipText.setText("Your weapon gives you " + PCWeaponEquip.PCSTRStat + " STR and " + PCWeaponEquip.Passive1 + " " +  PCWeaponEquip.Passive1X + "%");
+            }
+            else{
+                PCWeaponEquipText.setText("You have no weapon equipped.")
+            }
+
+            if(PCHeadEquip.GotEquip == true){
+                PC.PCPassive.push(PCHeadEquip.Passive1);
+                PC.PCPassiveX.push(PCHeadEquip.Passive1X);
+            }
+            if(PCChestEquip.GotEquip == true){
+                PC.PCPassive.push(PCChestEquip.Passive1);
+                PC.PCPassiveX.push(PCChestEquip.Passive1X);
+            }
+            if(PCHeadEquip.GotEquip == true){
+                PC.PCPassive.push(PCWeaponEquip.Passive1);
+                PC.PCPassiveX.push(PCWeaponEquip.Passive1X);
+            }
+
+            //UpdateHudElements(game, HudText(), setText(), PC, enemy);
+
+            //console.log("The turn is" + Turn);
+        }
+
+        function render() {
+
+            //game.debug.text("Time until event: " + game.time.events.duration.toFixed(0), 32, 32);
+            //game.debug.text("Next tick: " + game.time.events.next.toFixed(0), 32, 64);
+
+        }
+
+        function updateCounter() {
+
+            counter++;
+
+            text.setText('Counter: ' + counter);
+
+        }
+
+
+        function PCMoveUp(){
+            PC.pcsprite.y -= 32;
+
+        }
+        
+        function PCMoveDown(){
+            PC.pcsprite.y += 32;
+
+        }
+        
+        function PCMoveLeft(){
+            PC.pcsprite.x -= 32;
+
+
+        }
+        
+        function PCMoveRight(){
+            PC.pcsprite.x += 32;
+
+        }
+
+        /**ITEM GENERATION
+         *@param Quality(Param): Comes in 4 qualities (Common, Enchanted, Masterpiece, Mythical. These give modifiers to item stat rolls.
+         *@param GotEquip(Param): Is used to show that no actual equipment has been found yet. This will only be true until the player picks up an equip for that slot
+         *@param PCSTRStat(Param): Is the amount of STR the item grants.
+         *@param Passive1(Param): Is the passive that the item grants. For the full game, items can roll several passives. Follows the convention "Passive X(%)"
+         *@param Passive1X(Param): Is the value given to X in passives ie. Passive1(Lifesteal X%) and Passive1X(5) gives Lifesteal 5%
+         */
+
+        /**GENERATE QUALITY
+         * Use an RNG value from 0 to 100 to determine quality. Quality is an int used as a multiplier for stats and is listed below
+         * 1 = Mythical - 3x Mulitplier
+         * 2-10 = Masterpiece - 2x Mulitplier
+         * 11 - 50 = Magical - 1.5x Mulitplier
+         * 51 - 100 = Common - 1xMulitplier
+         * @return {*}
+         * @constructor
+         */
+        function GenerateQuality() {
+
+            var RNG = randomIntInRange(1, 101);
+            console.log("RNG for quality was rolled as " + RNG);
+            if (RNG == 1) {
+                return 3;
+            }
+            else if (RNG > 1 && RNG < 11) {
+                return 2;
+            }
+            else if (RNG > 10 && RNG < 51) {
+                return 1.5;
+            }
+            else {
+                return 1;
+            }
+        }
+
+        function GenerateEnemy(enemy){
+
+            var Quality = GenerateQuality();
+            console.log("The Enemy Quality multiplier is " + Quality);
+            var ENSTRStat = Quality * randomIntInRange(20,30);
+            var ENPassive = GeneratePassive(Quality);
+            var ENPassiveX = GeneratePassiveX(ENPassive, Quality);
+            console.log("the rolled values for a new enemy were " +  Quality  + ", " +  ENSTRStat + ", " +  ENPassive + ", " +  ENPassiveX + ", " );
+            var GeneratedEnemy = new EnemyProto(game, Quality, ENSTRStat, ENPassive, ENPassiveX);
+            console.log("the rolled values for a new enemy were " +  GeneratedEnemy.Quality + ", " +  GeneratedEnemy.ENSTRStat + ", " +  GeneratedEnemy.Passive1 + ", " +  GeneratedEnemy.Passive1X + ", " );
+            return GeneratedEnemy;
+
+            //PCPassives[0];
+        }
+
+        function EquipTestHelmet(){
+            var Quality = GenerateQuality();
+            console.log("The Quality multiplier is " + Quality);
+            var GotEquip = true;
+            var PCSTRStat = Quality * randomIntInRange(5,15);
+            var Passive1 = GeneratePassive(Quality);
+            var Passive1X = GeneratePassiveX(Passive1, Quality);
+            console.log("the rolled values for a new helmet were " +  Quality + ", " +  GotEquip + ", " +  PCSTRStat + ", " +  Passive1 + ", " +  Passive1X + ", " );
+            PCHeadEquip = new PCEquipProto(game, Quality, GotEquip, PCSTRStat, Passive1, Passive1X);
+            //PCPassives[0];
+        }
+
+        function EquipTestChestPlate(){
+            var Quality = GenerateQuality();
+            console.log("The Quality multiplier is " + Quality);
+            var GotEquip = true;
+            var PCSTRStat = Quality * randomIntInRange(15,25);
+            var Passive1 = GeneratePassive(Quality);
+            var Passive1X = GeneratePassiveX(Passive1, Quality);
+            console.log("the rolled values for a new chestplate were " +  Quality + ", " +  GotEquip + ", " +  PCSTRStat + ", " +  Passive1 + ", " +  Passive1X + ", " );
+            PCChestEquip = new PCEquipProto(game, Quality, GotEquip, PCSTRStat, Passive1, Passive1X);
+        }
+
+        function EquipTestWeapon(){
+            var Quality = GenerateQuality();
+            console.log("The Quality multiplier is " + Quality);
+            var GotEquip = true;
+            var PCSTRStat = Quality * randomIntInRange(25,30);
+            var Passive1 = GeneratePassive(Quality);
+            var Passive1X = GeneratePassiveX(Passive1, Quality);
+            console.log("the rolled values for a new weapon were " +  Quality + ", " +  GotEquip + ", " +  PCSTRStat + ", " +  Passive1 + ", " +  Passive1X + ", " );
+            PCWeaponEquip = new PCEquipProto(game, Quality, GotEquip, PCSTRStat, Passive1, Passive1X);
+        }
+
+
+        function GeneratePassive(Quality){
+            var PassiveArray = [
+                "Lifesteal", "Critical", "Burn", "Parry"
+            ];
+            //
+            var ChosenPassive = PassiveArray[Math.floor(Math.random() * PassiveArray.length)];
+            console.log("The Passive rolled was " + ChosenPassive);
+            return ChosenPassive;
+
+        }
+
+        /**
+         *
+         * @param ChosenPassive
+         * @param Quality
+         * @return {number}
+         * @constructor
+         */
+        function GeneratePassiveX(ChosenPassive, Quality){
+            //(ChosenPassive.PassMod) *
+            var ChosenPassiveX = (Quality * (Math.floor(Math.random()*5)) + 1);
+            console.log("The PassiveX rolled was " + ChosenPassiveX);
+            return ChosenPassiveX;
+        }
+
+
+
+        function TestCombat(){
+            PlayerPass = PC;
+            console.log("At the start of combat, PC HP was at " + PlayerPass.PCCURHP);
+            //var Enemy = enemies.getFirstAlive();
+            console.log("At the start of combat, enemy HP was at " + enemy.ENHP);
+            Combat(game, timerEvents, PlayerPass, enemy);
+        }
+
+
+
+
+        function HurtPlayer(){
+            PC.PCCURHP -= 30;
+        }
+
+
+        //TODO: AUTOMATE THIS PROCESS (NOT MANUALLY DEFINIED VARIABLES FOR I AND J)
+        /**
+         * Generates the floor tiles in a grid of i x j dimensions. Tiles are intended to be 32x32.
+         * @constructor
+         */
+        function FloorGeneration() {
+
+            for (var i = 15; i >= 0; i--) {
+                for (var j = 15; j >= 0; j--) {
+                    var scalenum = 2;
+                    //GridArr[i][j] = game.add.sprite(16 * i ,16 * j, 'DHFloor');
+                    GridArr[i][j] = new TileProto(game, 32 * i, 32 * j, 'DHFloor', 'DHWall', scalenum);
+                    console.log(GridArr[i][j]);
+                    //var go = game.add.sprite(160 + (32 * i), 32 * j, 'DHFloor');
+                    //GridArr[i][j].TileSprite.scale.setTo(2, 2);
+                    GridArr[i][j].TileType = 1;
+                    console.log(GridArr[i][j]);
+                }
+            }
+        }
+
+
+    }
+
+
+    </script>
+    <script src="Scripts/GenerateFloor.js" type="text/javascript"></script>
+
+    </body>
+</html>
