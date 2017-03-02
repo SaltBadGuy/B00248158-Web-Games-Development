@@ -40,8 +40,10 @@ function PCCharProto(game) {
  * @param Passive1XParam
  * @constructor
  */
-function PCEquipProto(game, QualityParam, GotEquipParam, PCSTRStatParam, Passive1Param, Passive1XParam) {
-    this.Quality = QualityParam,
+function PCEquipProto(game, TypeParam, QualityParam, GotEquipParam, PCSTRStatParam, Passive1Param, Passive1XParam) {
+
+        this.Type = TypeParam;
+        this.Quality = QualityParam,
         this.GotEquip = GotEquipParam,
         this.PCSTRStat = PCSTRStatParam,
         this.Passive1 = Passive1Param,
@@ -55,37 +57,76 @@ function PCEquipProto(game, QualityParam, GotEquipParam, PCSTRStatParam, Passive
  * @param Passive1XParam
  * @constructor
  */
-function EnemyProto(game, QualityParam, ENSTRStatParam, Passive1Param, Passive1XParam) {
-    this.enemysprite = game.add.sprite(300, 150, 'DHEnemy');
-    this.enemysprite.anchor.setTo(0.5, 0.5);
-    this.enemysprite.scale.setTo(2, 2);
-    this.Quality = QualityParam;
-    this.ENSTRStat = ENSTRStatParam;
-    this.Passive1 = Passive1Param;
-    this.Passive1X = Passive1XParam;
-    this.ENHP = 100 + this.ENSTRStat;
-    this.ENPATK = 5 + this.ENSTRStat;
-    this.ENPDEF = 5 + (0.1 * this.ENSTRStat);
-    this.ENSTR = this.ENSTRStat;
-    this.ENPassive = [Passive1Param, "N/A", "N/A"];
-    this.ENPassiveX = [Passive1XParam, "N/A", "N/A"];
+function EnemyProto(game, xpos, ypos, QualityParam, ENSTRStatParam, Passive1Param, Passive1XParam, scalenum) {
+        this.enemysprite = game.add.sprite(xpos, ypos, 'DHEnemy');
+        this.enemysprite.scale.setTo(scalenum, scalenum);
+        this.Quality = QualityParam;
+        this.ENSTRStat = ENSTRStatParam;
+        this.Passive1 = Passive1Param;
+        this.Passive1X = Passive1XParam;
+        this.ENHP = 100 + this.ENSTRStat;
+        this.ENPATK = 5 + this.ENSTRStat;
+        this.ENPDEF = 5 + (0.1 * this.ENSTRStat);
+        this.ENSTR = this.ENSTRStat;
+        this.ENPassive = [Passive1Param, "N/A", "N/A"];
+        this.ENPassiveX = [Passive1XParam, "N/A", "N/A"];
 }
 
-
-function TileProto(game, xpos, ypos, spritenamezero, spritenameone, scalenum){
-    this.TileXPos = xpos;
-    this.TileYPos = ypos;
-    this.TileType = 0;
-    this.tilesprite = new MakeObject(game, this, xpos, ypos, spritenamezero, spritenameone);
-    this.TileSprite.scale.setTo(scalenum, scalenum);
+/**
+ *
+ * @param game
+ * @param xpos
+ * @param ypos
+ * @param basetile
+ * @param scalenum
+ * @constructor
+ */
+function TileProto(game, xpos, ypos, basetile, scalenum){
+        this.TileXPos = xpos;
+        this.TileYPos = ypos;
+        this.TileType = 2;
+        this.BaseTile = game.add.sprite(xpos, ypos, basetile);
+        this.BaseTile.scale.setTo(scalenum, scalenum)
+        //this.BaseTile.scale.setTo(scalenum, scalenum);
+        //this.Tilesprite = new MakeObject(game, this, xpos, ypos, spritenamezero, spritenameone);
+        //this.TileSprite.scale.setTo(scalenum, scalenum);
 }
 
-function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone) {
-    console.log("The Tiletype is " + obj.TileType);
-    if (obj.TileType == 0) {
-        obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero)
-    }
-    else if (obj.TileType == 1) {
-        obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenameone)
-    }
+function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, spritenametwo, spritenamethree, spritenamefour, spritenamefive, spritenamesix, scalenum, EnemyArr, ChestArr) {
+        console.log("The Tiletype is " + obj.TileType);
+        if (obj.TileType == 0) {
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 1) {
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenameone);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 2) {
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenametwo);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 3) {
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamethree);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 4) {
+            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefour);
+            GenerateEnemy(game, xpos, ypos, EnemyArr, scalenum);
+            //obj.ThingSpawn.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 5) {
+            //game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero).scale.setTo(scalenum,scalenum);
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefive);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+        else if (obj.TileType == 6) {
+            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamesix);
+            obj.TileSprite.scale.setTo(scalenum, scalenum);
+        }
+}
+
+function ChestProto(game){
+    this.Loot = GenerateLoot();
+
 }
