@@ -6,8 +6,8 @@
  * @param game
  * @constructor
  */
-function PCCharProto(game) {
-    this.pcsprite = game.add.sprite(game.world.centerX, game.world.centerY, 'DHPC'),
+function PCCharProto(game, xpos, ypos) {
+    this.pcsprite = game.add.sprite(xpos, ypos, 'DHPC');
 
         //Refers to the player's maximum health. Is increased by Strength in the current prototype. Can be further increased by items
         this.PCMAXHP = 100;// + (0.5 * PCSTR);
@@ -26,8 +26,13 @@ function PCCharProto(game) {
     this.PCMAXHP = 100 + (0.5 * this.PCSTR);
     console.log("PCCURHP at the start of creation is " + this.PCCURHP);
     this.PCCURHP = this.PCMAXHP;
-    this.PCPassive = ["N/A", "N/A", "N/A"];
-    this.PCPassiveX = ["N/A", "N/A", "N/A"];
+    this.PCPassive = [];
+    console.debug("PCPassive length is " + this.PCPassive.length);
+    this.PCPots = 0;
+    this.PCPicks = 0;
+    this.PCCurses = 0;
+    game.physics.enable(this.pcsprite, Phaser.Physics.ARCADE);
+
 
 }
 
@@ -36,40 +41,52 @@ function PCCharProto(game) {
  * @param QualityParam
  * @param GotEquipParam
  * @param PCSTRStatParam
- * @param Passive1Param
- * @param Passive1XParam
+ * @param PassiveParam
+ * @param PassiveXParam
  * @constructor
  */
-function PCEquipProto(game, TypeParam, QualityParam, GotEquipParam, PCSTRStatParam, Passive1Param, Passive1XParam) {
+function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCSTRStatParam, PassiveParam) {
 
+        this.ID = IDParam;
         this.Type = TypeParam;
-        this.Quality = QualityParam,
-        this.GotEquip = GotEquipParam,
-        this.PCSTRStat = PCSTRStatParam,
-        this.Passive1 = Passive1Param,
-        this.Passive1X = Passive1XParam;
+        this.Quality = QualityParam;
+        this.GotEquip = GotEquipParam;
+        this.PCSTRStat = PCSTRStatParam;
+        this.EquipPassive = PassiveParam;
 }
 /**
  *
+ * @param game
+ * @param xpos
+ * @param ypos
+ * @param IDParam
  * @param QualityParam
  * @param ENSTRStatParam
- * @param Passive1Param
- * @param Passive1XParam
+ * @param PassiveParam
+ * @param PassiveXParam
+ * @param scalenum
  * @constructor
  */
-function EnemyProto(game, xpos, ypos, QualityParam, ENSTRStatParam, Passive1Param, Passive1XParam, scalenum) {
+function EnemyProto(game, xpos, ypos, IDParam, QualityParam, ENSTRStatParam, PassiveParam, scalenum) {
         this.enemysprite = game.add.sprite(xpos, ypos, 'DHEnemy');
+        console.log(this.enemysprite);
         this.enemysprite.scale.setTo(scalenum, scalenum);
         this.Quality = QualityParam;
         this.ENSTRStat = ENSTRStatParam;
-        this.Passive1 = Passive1Param;
-        this.Passive1X = Passive1XParam;
         this.ENHP = 100 + this.ENSTRStat;
         this.ENPATK = 5 + this.ENSTRStat;
         this.ENPDEF = 5 + (0.1 * this.ENSTRStat);
         this.ENSTR = this.ENSTRStat;
-        this.ENPassive = [Passive1Param, "N/A", "N/A"];
-        this.ENPassiveX = [Passive1XParam, "N/A", "N/A"];
+        console.log(PassiveParam);
+        this.ENPassive = PassiveParam;
+        /*this.ENPassive = {
+            ID: IDParam,
+            Passive: PassiveParam,
+            PassiveX:PassiveXParam
+        };*/
+        game.physics.enable(this.enemysprite, Phaser.Physics.ARCADE);
+        this.enemysprite.inputEnabled = true;
+
 }
 
 /**
@@ -86,15 +103,29 @@ function TileProto(game, xpos, ypos, basetile, scalenum){
         this.TileYPos = ypos;
         this.TileType = 2;
         this.BaseTile = game.add.sprite(xpos, ypos, basetile);
-        this.BaseTile.scale.setTo(scalenum, scalenum)
-        //this.BaseTile.scale.setTo(scalenum, scalenum);
+        this.BaseTile.scale.setTo(scalenum, scalenum);
+        game.physics.enable(this.BaseTile, Phaser.Physics.ARCADE);
+
+    //this.BaseTile.scale.setTo(scalenum, scalenum);
         //this.Tilesprite = new MakeObject(game, this, xpos, ypos, spritenamezero, spritenameone);
         //this.TileSprite.scale.setTo(scalenum, scalenum);
 }
 
-function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, spritenametwo, spritenamethree, spritenamefour, spritenamefive, spritenamesix, scalenum, EnemyArr, ChestArr) {
+function ChestProto(game, IDParam, xpos, ypos, loot, scalenum){
+    this.ID = IDParam;
+    this.chestsprite = game.add.sprite(xpos, ypos, 'DHChest');
+    this.chestsprite.scale.setTo(scalenum, scalenum);
+    this.ChestLoot = loot;
+    console.log(this.ChestLoot);
+    game.physics.enable(this.chestsprite, Phaser.Physics.ARCADE);
+
+}
+
+function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, spritenametwo, spritenamethree, spritenamefour, spritenamefive, spritenamesix, scalenum, PCParam, EnemyArr, ChestArr) {
         console.log("The Tiletype is " + obj.TileType);
-        if (obj.TileType == 0) {
+        //console.log(PCParam);
+
+    if (obj.TileType == 0) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
@@ -107,26 +138,23 @@ function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, sprite
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
         else if (obj.TileType == 3) {
-            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamethree);
-            obj.TileSprite.scale.setTo(scalenum, scalenum);
+            //GenerateChest(game, obj.TileXPos, obj.TileYPos, ChestArr, scalenum, PCParam);
+            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamethree);
         }
         else if (obj.TileType == 4) {
             //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefour);
-            GenerateEnemy(game, xpos, ypos, EnemyArr, scalenum);
+            //GenerateEnemy(game, xpos, ypos, EnemyArr, scalenum);
             //obj.ThingSpawn.scale.setTo(scalenum, scalenum);
         }
         else if (obj.TileType == 5) {
             //game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero).scale.setTo(scalenum,scalenum);
-            obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefive);
-            obj.TileSprite.scale.setTo(scalenum, scalenum);
+            console.debug("Generating player");
+            //PC = GeneratePlayer(game, xpos, ypos, PCParam, scalenum);
+            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefive);
+            //obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
         else if (obj.TileType == 6) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamesix);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
-}
-
-function ChestProto(game){
-    this.Loot = GenerateLoot();
-
 }
