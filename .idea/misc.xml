@@ -6,7 +6,12 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
-              <option name="trunkUrl" value="" />
+              <option name="branchUrls">
+                <list>
+                  <option value="https://github.com/SaltBadGuy/B00248158-Web-Games-Development/branches/V.P.0.5" />
+                </list>
+              </option>
+              <option name="trunkUrl" value="https://github.com/SaltBadGuy/B00248158-Web-Games-Development/branches/V.P.0.4" />
             </SvnBranchConfiguration>
           </value>
         </entry>
