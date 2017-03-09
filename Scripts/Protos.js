@@ -31,6 +31,9 @@ function PCCharProto(game, xpos, ypos) {
     this.PCPots = 0;
     this.PCPicks = 0;
     this.PCCurses = 0;
+    this.PCHeadEquip = Object;
+    this.PCChestEquip = Object;
+    this.PCWeaponEquip = Object;
     game.physics.enable(this.pcsprite, Phaser.Physics.ARCADE);
 
 
@@ -113,6 +116,7 @@ function TileProto(game, xpos, ypos, basetile, scalenum){
 
 function ChestProto(game, IDParam, xpos, ypos, loot, scalenum){
     this.ID = IDParam;
+    this.Looted = false;
     this.chestsprite = game.add.sprite(xpos, ypos, 'DHChest');
     this.chestsprite.scale.setTo(scalenum, scalenum);
     this.ChestLoot = loot;

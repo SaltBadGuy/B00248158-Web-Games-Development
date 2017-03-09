@@ -1,26 +1,32 @@
 /**
  * Created by Callum on 24/02/2017.
  */
-var CombatTurn = true;
 
-function Combat(game, timerEvents, Player, Enemy, Turn, InCombat) {
+
+function Combat(game, combatEvent, Player, Enemy, InCombat) {
     console.log("Starting Combat!");
+    console.log(InCombat);
+    console.log(Player);
     PBurn = 0;
     EBurn = 0;
+    var CombatTurn = {
+        Turn: true
+    };
     console.log("At the start of combat, player HP was at " + Player.PCCURHP);
     console.log("At the start of combat, enemy HP was at " + Enemy.ENHP);
     //game.time.events.loop(Phaser.Timer.SECOND, updateCounter, this);
-    //timerEvents.push(game.time.events.loop(1000, WhoAttacks(Player, Enemy), this));
-    timerEvents.push(game.time.events.loop(500, function () {
-        WhoAttacks(game, timerEvents, Player, Enemy, CombatTurn, InCombat)
+    //combatEvent.push(game.time.events.loop(1000, WhoAttacks(Player, Enemy), this));
+    combatEvent.push(game.time.events.loop(1000, function () {
+        WhoAttacks(game, combatEvent, Player, Enemy, CombatTurn, InCombat)
     }, this));
+    console.log(combatEvent);
     //incombat =  game.time.repeat(Phaser.Timer.SECOND, WhoAttacks(Player, Enemy), this);
 }
 
 /**
  *
  * @param game
- * @param timerEvents
+ * @param combatEvent
  * @param Player
  * @param Enemy
  * @param Turn
@@ -28,31 +34,43 @@ function Combat(game, timerEvents, Player, Enemy, Turn, InCombat) {
  * @return {boolean}
  * @constructor
  */
-function WhoAttacks(game, timerEvents, Player, Enemy, Turn, InCombat) {
+function WhoAttacks(game, combatEvent, Player, Enemy, Turn, InCombat) {
     /**Determines which character has their turn.
      * true = player's turn
      * false = enemy's turn*/
-    var apply = 0;
-    if (Player.PCCURHP < 1 || Enemy.ENHP < 1) {
+    console.log(combatEvent);
+    console.log(Player);
+    console.log(Player.PCCURHP);
+    console.log(Enemy);
+    console.log(Enemy.ENHP);
+    console.log(Turn.Turn);
+
+    if (Player.PCCURHP < 1 || Enemy.ENHP < 1){
         console.log("Ending combat");
-        game.time.events.remove(timerEvents[0]);
-        return false;
+        if (Player.PCCURHP <= 0){
+            console.log("Destroying Player");
+            Player.pcsprite.destroy();
+        }
+        if (Enemy.ENHP <= 0){
+            console.log("Destroying Enemy");
+            Enemy.enemysprite.destroy();
+        }
+        game.time.events.removeAll(combatEvent);
     }
-    if (InCombat) {
-        if (CombatTurn) {
+        if (Turn.Turn == true) {
             console.log("Player's turn to attack!");
-            CombatTurn = PlayerAttack(game, Player, Enemy, Turn);
+            PlayerAttack(game, Player, Enemy, Turn);
         }
         else {
             console.log("Enemy's turn to attack!");
-            CombatTurn = EnemyAttack(game, Player, Enemy, Turn);
+            EnemyAttack(game, Player, Enemy, Turn);
 
         }
-    }
 }
 
 /**
  *
+ * @param
  * @param Player
  * @param Enemy
  * @param Turn
@@ -61,16 +79,15 @@ function WhoAttacks(game, timerEvents, Player, Enemy, Turn, InCombat) {
  */
 function PlayerAttack(game, Player, Enemy, Turn) {
 
-    console.log("The turn is " + Turn);
+    console.log("The turn is " + Turn.Turn);
     console.log("Player is about to attack!");
     console.log("Enemy HP was at " + Enemy.ENHP);
     var ActualDamage = 0;
     var EstBaseDamage = Player.PCPATK - Enemy.ENPDEF;
-    var apply = 0;
 
     console.log("The enemy Passive length is " + Enemy.ENPassive.length + " and the player passive length is " + Player.PCPassive.length);
     for (var i = 0; i < Player.PCPassive.length || i < Enemy.ENPassive.length; i++) {
-        ApplyPassive(game, EstBaseDamage, Player.PCPassive[i], Enemy.ENPassive[i], Turn);
+        ApplyPassive(game, Player, Enemy, EstBaseDamage, Player.PCPassive[i], Enemy.ENPassive[i], Turn);
     }
     if (ActualDamage > 0) {
         if (ActualDamge > EstBaseDamage) {
@@ -88,13 +105,12 @@ function PlayerAttack(game, Player, Enemy, Turn) {
     }
     console.log("Estimated damage is " + EstBaseDamage);
     console.log("Now Enemy HP is " + Enemy.ENHP);
-    Turn = false;
-    console.log("The turn is " + Turn);
-    return Turn;
+    Turn.Turn = false;
+    console.log("The turn is " + Turn.Turn);
 }
 
 /**
- *
+ * @param game
  * @param Player
  * @param Enemy
  * @param Turn
@@ -103,7 +119,7 @@ function PlayerAttack(game, Player, Enemy, Turn) {
  */
 function EnemyAttack(game, Player, Enemy, Turn) {
 
-    console.log("The turn is " + Turn);
+    console.log("The turn is " + Turn.Turn);
     console.log("Enemy is about to attack!");
     console.log("Player HP was at " + Player.PCCURHP);
     var ActualDamage = 0;
@@ -130,19 +146,19 @@ function EnemyAttack(game, Player, Enemy, Turn) {
     }
     console.log("Estimated damage is " + EstBaseDamage);
     console.log("Now Player HP is " + Player.PCCURHP);
-    Turn = true;
-    console.log("The turn is " + Turn);
-    return Turn;
+    Turn.Turn = true;
+    console.log("The turn is " + Turn.Turn);
 }
 
 function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) {
     //Calling RNG to check passives
-    var RNG = randomIntInRange(0, 101);
+    var RNG = 1; // parseInt((Math.random() *  100), 10);
+    console.log(Turn.Turn);
     console.log("RNG Roll this round is " + RNG);
     /**When it's the player's turn*/
     if (typeof PPassive == "undefined"){
         console.log("No passive in this player slot.");
-        PPassive.Passive = {
+        PPassive = {
             ID: "GETRIDOFME",
             Passive: "N/A",
             PassiveX: "N/A"
@@ -156,10 +172,13 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             PassiveX: "N/A"
         };
     }
-    if (Turn == true) {
+    if (Turn.Turn == true) {
         /**Passives belonging to the player that activate when the player is attacking*/
         if (PPassive.Passive == "Lifesteal") {
             console.log("Activating Player's Lifesteal");
+            var text = game.make.text(200, 200, "LIFESTEAL!", { font: "bold 32px alphabeta", fill: "#ff0044" });
+            text.setText("LIFESTEAL!!");
+            text.anchor.set(0.5);
             PC.PCCURHP += EstBaseDamage * (PPassive.PassiveX / 100);
             console.log("Healed for " + EstBaseDamage * (PPassive.PassiveX / 100));
         }
@@ -168,7 +187,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             console.log("Attempting Player's Critical");
             if (RNG < PPassive.PassiveX) {
                 console.log("Activating Player's Critical");
-                game.make.text(PC.pcsprite.x, PC.pcsprite.y, "CRIT!!!",{ font: "bold 32px Arial", fill: "#f9ff00" });
+                game.make.text(PC.pcsprite.x, PC.pcsprite.y, "CRIT!!!",{ font: "bold 32px alphabeta", fill: "#f9ff00" });
                 PlayerAttack.ActualDamage = EstBaseDamage * 2;
             }
             else {
@@ -176,7 +195,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             }
         }
         else if (PPassive.Passive == "Burn") {
-            PBurn += PPassive;
+            PBurn += PPassive.PassiveX;
             console.log("Player's Burn Applied! Currently " + PBurn)
         }
         /**Passives belonging to the enemy that activate when the player is attacking*/
@@ -209,7 +228,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
 
         }
         else if (EPassive.Passive == "Burn") {
-            PBurn += EPassiveX;
+            EBurn += EPassive.PassiveX;
             console.log("Enemy's  Burn Applied! Currently " + EBurn)
         }
         else if (PPassive.Passive == "Parry") {

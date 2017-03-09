@@ -5,8 +5,9 @@ function GenerateEnemy(game, EnemyID, xpos, ypos, EnemyArr, scalenum){
     EnemyID++;
     var Quality = GenerateQuality();
     console.log("The Enemy Quality multiplier is " + Quality);
-    var ENSTRStat = Quality * randomIntInRange(20,30);
-    var ENPassive = GeneratePassive(Quality);
+    var ENSTRStat = Quality * parseInt((Math.random() *  10), 10) + 20;
+    var ENPassive = GeneratePassive(EnemyID, Quality);
+    console.log(ENPassive);
     //var ENPassiveX = GeneratePassiveX(ENPassive, Quality);
     console.log("the rolled values for a new enemy were " +  Quality  + ", " +  ENSTRStat + ", " +  ENPassive + ", ");
     var GeneratedEnemy = new EnemyProto(game, xpos, ypos, EnemyID, Quality, ENSTRStat, ENPassive, scalenum);

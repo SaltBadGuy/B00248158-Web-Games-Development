@@ -1,20 +1,126 @@
 /**
  * Created by Callum on 24/02/2017.
  */
-function UpdateHudElements(game, HudText, setText, PC, enemy) {
+function UpdateHudElements(game, HudText, PC, enemy) {
+
     HudText.PCHPText.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
 
-    HudText.PCCURHP.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
+    HudText.PCSTRText.setText("STR = " + PC.PCSTR);
 
-    game.PCSTRText.setText("STR = " + PC.PCSTR);
+    HudText.PCPATKText.setText("ATK = " + PC.PCPATK);
 
-    game.PCPATKText.setText("ATK = " + PC.PCPATK);
+    HudText.PCPDEFText.setText("DEF = " + PC.PCPDEF);
 
-    game.PCPDEFText.setText("DEF = " + PC.PCPDEF);
+    HudText.PCPotsText.setText("Potions: " + PC.PCPots);
 
-    game.EnemyHP.setText("Enemy HP is " + enemy.ENHP);
+    HudText.PCPicksText.setText("Picks: " + PC.PCPicks);
 
-    HudText.PCHPText.setText("aaa");
+    HudText.PCCursesText.setText("Curses: " + PC.PCCurses);
 
-    HudText.PCHPText = "aaa";
+
+    //Display the stats of your equipment (if they are equipped)
+    //Helmet text display
+
+    var HeadPassivesString = "";
+    var ChestPassivesString = "";
+    var WeaponPassivesString = "";
+
+
+
+
+    if (PC.PCHeadEquip.GotEquip == true) {
+        if (PC.PCHeadEquip.Quality == 1){
+            HudText.PCHeadEquipText.addColor("#ffffff", 0)
+        }
+        else if (PC.PCHeadEquip.Quality == 1.5){
+            HudText.PCHeadEquipText.addColor("#0063ff", 0)
+        }
+        else if (PC.PCHeadEquip.Quality == 2){
+            HudText.PCHeadEquipText.addColor("#9600ff", 0)
+        }
+        else if (PC.PCHeadEquip.Quality == 3){
+            HudText.PCHeadEquipText.addColor("#ff7f00", 0)
+        }
+        HeadPassivesString = "";
+        if (PC.PCHeadEquip.EquipPassive.length > 0){
+            HeadPassivesString = "and ";
+            var PassiveStringConcat = "";
+            for (i = 0; i < PC.PCHeadEquip.EquipPassive.length; i++){
+                PassiveStringConcat = PassiveStringConcat.concat("and " + PC.PCHeadEquip.EquipPassive[i].Passive + " " + PC.PCHeadEquip.EquipPassive[i].PassiveX + "% ");
+                HeadPassivesString = PassiveStringConcat;
+            }
+        }
+        else{
+            HeadPassivesString = " ";
+        }
+        HudText.PCHeadEquipText.setText("Your helmet gives you " + PC.PCHeadEquip.PCSTRStat + " STR " + HeadPassivesString);
+    }
+    else{
+        HudText.PCHeadEquipText.setText("You have no helmet equipped.")
+    }
+    //Chestplate text display
+    if (PC.PCChestEquip.GotEquip == true) {
+        if (PC.PCChestEquip.Quality == 1){
+            HudText.PCChestEquipText.addColor("#ffffff", 0)
+        }
+        else if (PC.PCChestEquip.Quality == 1.5){
+            HudText.PCChestEquipText.addColor("#0063ff", 0)
+        }
+        else if (PC.PCChestEquip.Quality == 2){
+            HudText.PCChestEquipText.addColor("#9600ff", 0)
+        }
+        else if (PC.PCChestEquip.Quality == 3){
+            HudText.PCChestEquipText.addColor("#ff7f00", 0)
+        }
+        ChestPassivesString = "";
+        if (PC.PCChestEquip.EquipPassive.length > 0){
+            ChestPassivesString = "and ";
+            PassiveStringConcat = "";
+            for (i = 0; i < PC.PCChestEquip.EquipPassive.length; i++){
+                PassiveStringConcat = PassiveStringConcat.concat("and " + PC.PCChestEquip.EquipPassive[i].Passive + " " + PC.PCChestEquip.EquipPassive[i].PassiveX + "% ");
+                ChestPassivesString = PassiveStringConcat;
+            }
+        }
+        else{
+            ChestPassivesString = " ";
+        }
+        HudText.PCChestEquipText.setText("Your chestplate gives you " + PC.PCChestEquip.PCSTRStat + " STR " + ChestPassivesString);
+    }
+    else{
+        HudText.PCChestEquipText.setText("You have no chestplate equipped.")
+    }
+    //Weapon text display
+    if (PC.PCWeaponEquip.GotEquip == true) {
+        if (PC.PCWeaponEquip.Quality == 1){
+            HudText.PCWeaponEquipText.addColor("#ffffff", 0)
+        }
+        else if (PC.PCWeaponEquip.Quality == 1.5){
+            HudText.PCWeaponEquipText.addColor("#0063ff", 0)
+        }
+        else if (PC.PCWeaponEquip.Quality == 2){
+            HudText.PCWeaponEquipText.addColor("#9600ff", 0)
+        }
+        else if (PC.PCWeaponEquip.Quality == 3){
+            HudText.PCWeaponEquipText.addColor("#ff7f00", 0)
+        }
+        WeaponPassivesString = "";
+        if (PC.PCWeaponEquip.EquipPassive.length > 0){
+            WeaponPassivesString = "and ";
+            PassiveStringConcat = "";
+            for (i = 0; i < PC.PCWeaponEquip.EquipPassive.length; i++){
+                PassiveStringConcat = PassiveStringConcat.concat("and " + PC.PCWeaponEquip.EquipPassive[i].Passive + " " + PC.PCWeaponEquip.EquipPassive[i].PassiveX + "% ");
+                WeaponPassivesString = PassiveStringConcat;
+            }
+        }
+        else{
+            WeaponPassivesString = " ";
+        }
+        HudText.PCWeaponEquipText.setText("Your weapon gives you " + PC.PCWeaponEquip.PCSTRStat + " STR " + WeaponPassivesString);
+    }
+    else {
+        HudText.PCWeaponEquipText.setText("You have no weapon equipped.")
+    }
+    //HudText.PCWeaponEquipText.setText("Your helmet gives you " + PC.PCHeadEquip.PCSTRStat + " STR " + HeadPassivesString + "Your chestplate gives you " + PC.PCChestEquip.PCSTRStat + " STR " + ChestPassivesString + "Your weapon gives you " + PC.PCWeaponEquip.PCSTRStat + " STR " + WeaponPassivesString);
+
+    //HudText.EnemyHP.setText("Enemy HP is " + enemy.ENHP);
 }
