@@ -21,26 +21,17 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
 
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
-
-            //GridArr[i][j] = game.add.sprite(16 * i ,16 * j, 'DHFloor');
             console.log(i + ", " + j);
             GridArr[i][j] = new TileProto(game, gridwidthgap + (cellsize * i), (cellsize * j), 'DHFloor', scalenum);
-            //console.log("GridArr[" + i + "][" + j + "] is " + GridArr[i][j]);
-            //var go = game.add.sprite(160 + (32 * i), 32 * j, 'DHFloor');
-            //GridArr[i][j].TileSprite.scale.setTo(2, 2);
         }
     }
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
             GridArr[0][j].TileType = 1;
-            //GridArr[0][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
             GridArr[i][0].TileType = 1;
-            //GridArr[i][0].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs',  scalenum);
             GridArr[width][j].TileType = 1;
-            //GridArr[14][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
             GridArr[i][height].TileType = 1;
-            //GridArr[i][14].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
-            //GridArr[i][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', scalenum);
+
         }
     }
 
@@ -76,9 +67,7 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
     console.log(parseInt((Math.random() *  width / 3), 10));
     j = 2 * parseInt((Math.random() *  width / 3), 10) + 1;
     GridArr[i][1].TileType = 5;
-    //GridArr[i][1].TileSprite = MakeObject(game, GridArr[i][1], GridArr[i][1].TileXPos, GridArr[i][1].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
     GridArr[1][j].TileType = 6;
-    //GridArr[0][j].TileSprite = MakeObject(game, GridArr[0][j], GridArr[0][j].TileXPos, GridArr[0][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
 
     var ChestPool = parseInt((Math.random() *  2), 10) + 3;
     var EnemyPool = parseInt((Math.random() *  5), 10) + 3;
@@ -86,11 +75,11 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
         i = parseInt((Math.random() *  width - 1), 10);
         j = parseInt((Math.random() *  width - 1), 10);
 
-        if (GridArr[i][j].TileType == 0) {
+        if (GridArr[i][j].TileType === 0) {
             GridArr[i][j].TileType = 3;
             ChestPool--;
         }
-        if (ChestPool == 0){
+        if (ChestPool === 0){
             break;
         }
     } while (ChestPool > 0);
@@ -99,7 +88,7 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
         i = parseInt((Math.random() *  height - 1), 10);
         j = parseInt((Math.random() *  height - 1), 10);
 
-        if (GridArr[i][j].TileType == 0) {
+        if (GridArr[i][j].TileType === 0) {
             GridArr[i][j].TileType = 4;
             EnemyPool--;
         }

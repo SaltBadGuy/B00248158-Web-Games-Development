@@ -1,12 +1,23 @@
 /**
  * Created by Callum on 24/02/2017.
  */
+
 /**
  *
  * @param game
+ * @param xpos
+ * @param ypos
+ * @param GridX
+ * @param GridY
+ * @param scalenum
  * @constructor
  */
-function PCCharProto(game, xpos, ypos) {
+function PCCharProto(game, GridArr, xpos, ypos, GridX, GridY, scalenum) {
+    this.GridX = GridX;
+    this.GridY = GridY;
+
+    console.log("GridX is " + GridX);
+    console.log("GridY is " + GridY);
     this.pcsprite = game.add.sprite(xpos, ypos, 'DHPC');
 
         //Refers to the player's maximum health. Is increased by Strength in the current prototype. Can be further increased by items
@@ -45,7 +56,6 @@ function PCCharProto(game, xpos, ypos) {
  * @param GotEquipParam
  * @param PCSTRStatParam
  * @param PassiveParam
- * @param PassiveXParam
  * @constructor
  */
 function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCSTRStatParam, PassiveParam) {
@@ -66,7 +76,6 @@ function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCS
  * @param QualityParam
  * @param ENSTRStatParam
  * @param PassiveParam
- * @param PassiveXParam
  * @param scalenum
  * @constructor
  */
@@ -129,35 +138,26 @@ function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, sprite
         console.log("The Tiletype is " + obj.TileType);
         //console.log(PCParam);
 
-    if (obj.TileType == 0) {
+    if (obj.TileType === 0) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
-        else if (obj.TileType == 1) {
+        else if (obj.TileType === 1) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenameone);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
-        else if (obj.TileType == 2) {
+        else if (obj.TileType === 2) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenametwo);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
-        else if (obj.TileType == 3) {
-            //GenerateChest(game, obj.TileXPos, obj.TileYPos, ChestArr, scalenum, PCParam);
-            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamethree);
+        else if (obj.TileType === 3) {
         }
-        else if (obj.TileType == 4) {
-            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefour);
-            //GenerateEnemy(game, xpos, ypos, EnemyArr, scalenum);
-            //obj.ThingSpawn.scale.setTo(scalenum, scalenum);
+        else if (obj.TileType === 4) {
         }
-        else if (obj.TileType == 5) {
-            //game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamezero).scale.setTo(scalenum,scalenum);
+        else if (obj.TileType === 5) {
             console.debug("Generating player");
-            //PC = GeneratePlayer(game, xpos, ypos, PCParam, scalenum);
-            //obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamefive);
-            //obj.TileSprite.scale.setTo(scalenum, scalenum);
         }
-        else if (obj.TileType == 6) {
+        else if (obj.TileType === 6) {
             obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamesix);
             obj.TileSprite.scale.setTo(scalenum, scalenum);
         }

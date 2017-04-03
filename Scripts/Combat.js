@@ -46,6 +46,7 @@ function WhoAttacks(game, combatEvent, Player, Enemy, Turn, InCombat) {
     console.log(Turn.Turn);
 
     if (Player.PCCURHP < 1 || Enemy.ENHP < 1){
+        InCombat.InCombat = false;
         console.log("Ending combat");
         if (Player.PCCURHP <= 0){
             console.log("Destroying Player");
@@ -57,7 +58,7 @@ function WhoAttacks(game, combatEvent, Player, Enemy, Turn, InCombat) {
         }
         game.time.events.removeAll(combatEvent);
     }
-        if (Turn.Turn == true) {
+        if (Turn.Turn === true) {
             console.log("Player's turn to attack!");
             PlayerAttack(game, Player, Enemy, Turn);
         }
@@ -70,7 +71,7 @@ function WhoAttacks(game, combatEvent, Player, Enemy, Turn, InCombat) {
 
 /**
  *
- * @param
+ * @param game
  * @param Player
  * @param Enemy
  * @param Turn
@@ -156,7 +157,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
     console.log(Turn.Turn);
     console.log("RNG Roll this round is " + RNG);
     /**When it's the player's turn*/
-    if (typeof PPassive == "undefined"){
+    /*if (typeof PPassive === "undefined"){
         console.log("No passive in this player slot.");
         PPassive = {
             ID: "GETRIDOFME",
@@ -164,17 +165,17 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             PassiveX: "N/A"
         };
     }
-    if (typeof EPassive == "undefined"){
+    if (typeof EPassive === "undefined"){
         console.log("No passive in this enemy slot.");
         EPassive = {
             ID: "GETRIDOFME",
             Passive: "N/A",
             PassiveX: "N/A"
         };
-    }
-    if (Turn.Turn == true) {
+    }*/
+    if (Turn.Turn === true) {
         /**Passives belonging to the player that activate when the player is attacking*/
-        if (PPassive.Passive == "Lifesteal") {
+        if (PPassive.Passive === "Lifesteal") {
             console.log("Activating Player's Lifesteal");
             var text = game.make.text(200, 200, "LIFESTEAL!", { font: "bold 32px alphabeta", fill: "#ff0044" });
             text.setText("LIFESTEAL!!");
@@ -183,7 +184,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             console.log("Healed for " + EstBaseDamage * (PPassive.PassiveX / 100));
         }
     }
-        else if (PPassive.Passive == "Critical") {
+        else if (PPassive.Passive === "Critical") {
             console.log("Attempting Player's Critical");
             if (RNG < PPassive.PassiveX) {
                 console.log("Activating Player's Critical");
@@ -194,14 +195,14 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
                 console.log("Critical Failed");
             }
         }
-        else if (PPassive.Passive == "Burn") {
+        else if (PPassive.Passive === "Burn") {
             PBurn += PPassive.PassiveX;
             console.log("Player's Burn Applied! Currently " + PBurn)
         }
         /**Passives belonging to the enemy that activate when the player is attacking*/
-        else if (EPassive.Passive == "Parry") {
-            console.log("Getting attacked, attempting Player's Parry");
-            if (RNG < EPassiveX) {
+        else if (EPassive.Passive === "Parry") {
+            console.log("Getting attacked, attempting Enemy's Parry");
+            if (RNG < EPassive.PassiveX) {
                 console.log("Activating Player's Parry");
                 PlayerAttack.ActualDamage = -1;
             }
@@ -211,12 +212,12 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
         }
     /**When it's the enemy's turn*/
     else {
-        if (EPassive.Passive == "Lifesteal") {
+        if (EPassive.Passive === "Lifesteal") {
             console.log("Activating Enemy's Lifesteal");
-            Enemy.ENHP += EstBaseDamage * (EPassiveX / 100);
+            Enemy.ENHP += EstBaseDamage * (EPassive.PassiveX / 100);
             console.log("Healed for " + EstBaseDamage * (EPassive.PassiveX / 100));
         }
-        else if (EPassive.Passive == "Critical") {
+        else if (EPassive.Passive === "Critical") {
             console.log("Attempting Enemy's  Critical");
             if (RNG < EPassive.PassiveX ) {
                 console.log("Activating Enemy's  Critical");
@@ -227,18 +228,18 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             }
 
         }
-        else if (EPassive.Passive == "Burn") {
+        else if (EPassive.Passive === "Burn") {
             EBurn += EPassive.PassiveX;
             console.log("Enemy's  Burn Applied! Currently " + EBurn)
         }
-        else if (PPassive.Passive == "Parry") {
-            console.log("Gettig attacked, attempting Enemy's  Parry");
+        else if (PPassive.Passive === "Parry") {
+            console.log("Getting attacked, attempting Player's  Parry");
             if (RNG < PPassive.PassiveX) {
-                console.log("Activating Enemy's Parry");
+                console.log("Activating Players's Parry");
                 PlayerAttack.ActualDamage = -1;
             }
             else {
-                console.log("Enemy's  Parry Failed");
+                console.log("Player's Parry Failed");
             }
         }
     }

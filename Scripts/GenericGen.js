@@ -15,7 +15,7 @@
 function GenerateQuality() {
     var RNG = parseInt((Math.random() *  100), 10);
     console.log("RNG for quality was rolled as " + RNG);
-    if (RNG == 1) {
+    if (RNG === 1) {
         return 3;
     }
     else if (RNG > 1 && RNG < 11) {
@@ -48,16 +48,16 @@ function GeneratePassive(IDParam, Quality){
     var PassiveArray = [
         "Lifesteal", "Critical", "Burn", "Parry"
     ];
-    if (Quality == 1){
+    if (Quality === 1){
         PassiveAmount = 0;
     }
-    else if (Quality == 1.5){
+    else if (Quality === 1.5){
         PassiveAmount = 1;
     }
-    else if (Quality == 2){
+    else if (Quality === 2){
         PassiveAmount = 2;
     }
-    else if (Quality == 3){
+    else if (Quality === 3){
         PassiveAmount = 3;
     }
     for (var i = 0; i < PassiveAmount; i++){

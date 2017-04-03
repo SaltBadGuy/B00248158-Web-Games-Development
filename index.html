@@ -120,12 +120,6 @@
         var Turn;
         var timerEvents = [];
 
-        var Element1 = "aaa";
-        var Element2 = "bbb";
-        var Element3 = "ccc";
-        var Element4 = "ddd";
-        var Element5 = "eee";
-
         /**Floor Generation Stats*/
 
         var width;
@@ -232,22 +226,22 @@
             //NOTE: This captures the initial press of the key. This is intended as the movement is grid-based and this prevents players from accidentally moving more squares than they need to.
             keyUp = game.input.keyboard.addKey(Phaser.Keyboard.W);
             keyUp.onDown.add(function(){
-                PCMoveUp(PC);
+                PCMoveUp(PC, game, GridArr, InCombat);
             }, this);
 
             keyDown = game.input.keyboard.addKey(Phaser.Keyboard.S);
             keyDown.onDown.add(function(){
-                PCMoveDown(PC);
+                PCMoveDown(PC, game, GridArr, InCombat);
             }, this);
 
             keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.A);
             keyLeft.onDown.add(function(){
-                PCMoveLeft(PC);
+                PCMoveLeft(PC, game, GridArr, InCombat);
             }, this);
             
             keyRight = game.input.keyboard.addKey(Phaser.Keyboard.D);
             keyRight.onDown.add(function(){
-                PCMoveRight(PC);
+                PCMoveRight(PC, game, GridArr, InCombat);
             }, this);
 
             //Capture input for debug purposes
@@ -290,9 +284,6 @@
             PC.PCChestEquip = new PCEquipProto(game, 0, "ChestArmour", 1, false, 0, "N/A");
             PC.PCWeaponEquip = new PCEquipProto(game, 0, "Weapon", 1, false, 0, "N/A");
 
-            //text = game.add.text(700, 30, 'Time: 0', { font: "32px alphabeta", fill: "#ffffff", align: "center" });
-            //.anchor.setTo(0.5, 0.5);
-
             for (var i = 0; i < EnemyArr.length; i++){
                 console.log(EnemyArr[i]);
                 game.physics.enable(EnemyArr[i].enemysprite, Phaser.Physics.ARCADE);
@@ -312,9 +303,7 @@
 
             //Save the MAXHP at the start of the step before any changes are made
             PrevMAXHP = PC.PCMAXHP;
-            //console.log(PC.PCCURHP);
             //Updates all stats
-            //console.log(PCHeadEquip.PCSTRStat + PCChestEquip.PCSTRStat + PCWeaponEquip.PCSTRStat)
             PC.PCSTR = PC.BasePCSTR + PC.PCHeadEquip.PCSTRStat + PC.PCChestEquip.PCSTRStat + PC.PCWeaponEquip.PCSTRStat;
 
             //Refers to the player's physical attack. Is increased by Strength in the current prototype and has a base value of 20.
@@ -330,8 +319,8 @@
             }
 
             //Check if the MAXHP has changed during this step and if the player was at full health before update the CURHP to match the new MAXHP
-            if (PC.PCMAXHP != PrevMAXHP) {
-                if (PC.PCCURHP == PrevMAXHP) {
+            if (PC.PCMAXHP !== PrevMAXHP) {
+                if (PC.PCCURHP === PrevMAXHP) {
                     PC.PCCURHP = PC.PCMAXHP;
                     console.log("Player was at full health before, matching their hp to their new maximum");
                 }
@@ -341,24 +330,19 @@
             UpdateHudElements(game, HudText, PC, EnemyArr[0]);
 
             for (var i = 0; i < ChestArr.length; i++) {
-                //console.log(PC.pcsprite);
-                //console.log(ChestArr[i].chestsprite);
                 game.physics.arcade.collide(PC.pcsprite, ChestArr[i].chestsprite, function(){CheckChest(PC, ChestArr[i])}, null, this);
             }
 
             //console.log(EnemyArr.length);
             for (i = 0; i < EnemyArr.length; i++) {
                 if (EnemyArr[i].enemysprite.input.pointerOver()){
-                    //Element1 = "Enemy HP is " + EnemyArr[i].ENHP;
                 }
                 game.physics.arcade.collide(PC.pcsprite, EnemyArr[i].enemysprite, function(){ColliderEnemy(game, timerEvents, PC, EnemyArr[i], InCombat, Turn)}, null, this);
             }
-            //UpdateHudElements(game, HudText(), setText(), PC, enemy);
         }
 
         function render() {
             game.debug.body(PC.pcsprite);
-            //game.debug.body(sprite2);
             for (var i = 0; i < ChestArr.length; i++) {
                 game.debug.body(ChestArr[i].chestsprite);
             }
