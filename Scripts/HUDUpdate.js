@@ -90,8 +90,8 @@ function UpdateHudElements(game, HudText, PC, enemy) {
         HudText.PCChestEquipText.setText("You have no chestplate equipped.")
     }
     //Weapon text display
-    if (PC.PCWeaponEquip.GotEquip == true) {
-        if (PC.PCWeaponEquip.Quality == 1){
+    if (PC.PCWeaponEquip.GotEquip === true) {
+        if (PC.PCWeaponEquip.Quality === 1){
             HudText.PCWeaponEquipText.addColor("#ffffff", 0)
         }
         else if (PC.PCWeaponEquip.Quality == 1.5){
