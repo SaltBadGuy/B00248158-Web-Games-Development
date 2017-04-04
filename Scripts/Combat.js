@@ -168,7 +168,7 @@ function ApplyPassive(game, PC, Enemy, EstBaseDamage, PPassive, EPassive, Turn) 
             console.log("Attempting Player's Critical");
             if (RNG < PPassive.PassiveX) {
                 console.log("Activating Player's Critical");
-                game.make.text(PC.pcsprite.x, PC.pcsprite.y, "CRIT!!!",{ font: "bold 32px Arial", fill: "#f9ff00" });
+                game.make.text(PC.pcsprite.x, PC.pcsprite.y, "CRIT!!!",{ font: "bold 32px alphabeta", fill: "#f9ff00" });
                 PlayerAttack.ActualDamage = EstBaseDamage * 2;
             }
             else {
