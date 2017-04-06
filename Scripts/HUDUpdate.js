@@ -1,7 +1,7 @@
 /**
  * Created by Callum on 24/02/2017.
  */
-function UpdateHudElements(game, HudText, PC, enemy) {
+function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
 
     HudText.PCHPText.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
 
@@ -17,6 +17,21 @@ function UpdateHudElements(game, HudText, PC, enemy) {
 
     HudText.PCCursesText.setText("Curses: " + PC.PCCurses);
 
+    if (PC.PicksActive){
+        HudText.PCPickActive.alpha = 1;
+    }
+    else{
+        HudText.PCPickActive.alpha = 0;
+    }
+
+    if (PC.CursesActive){
+        HudText.PCCurseActive.alpha = 1;
+    }
+    else{
+        HudText.PCCurseActive.alpha = 0;
+    }
+
+
 
     //Display the stats of your equipment (if they are equipped)
     //Helmet text display
@@ -28,17 +43,17 @@ function UpdateHudElements(game, HudText, PC, enemy) {
 
 
 
-    if (PC.PCHeadEquip.GotEquip == true) {
-        if (PC.PCHeadEquip.Quality == 1){
+    if (PC.PCHeadEquip.GotEquip === true) {
+        if (PC.PCHeadEquip.Quality === 1){
             HudText.PCHeadEquipText.addColor("#ffffff", 0)
         }
-        else if (PC.PCHeadEquip.Quality == 1.5){
+        else if (PC.PCHeadEquip.Quality === 1.5){
             HudText.PCHeadEquipText.addColor("#0063ff", 0)
         }
-        else if (PC.PCHeadEquip.Quality == 2){
+        else if (PC.PCHeadEquip.Quality === 2){
             HudText.PCHeadEquipText.addColor("#9600ff", 0)
         }
-        else if (PC.PCHeadEquip.Quality == 3){
+        else if (PC.PCHeadEquip.Quality === 3){
             HudText.PCHeadEquipText.addColor("#ff7f00", 0)
         }
         HeadPassivesString = "";
@@ -59,17 +74,17 @@ function UpdateHudElements(game, HudText, PC, enemy) {
         HudText.PCHeadEquipText.setText("You have no helmet equipped.")
     }
     //Chestplate text display
-    if (PC.PCChestEquip.GotEquip == true) {
-        if (PC.PCChestEquip.Quality == 1){
+    if (PC.PCChestEquip.GotEquip === true) {
+        if (PC.PCChestEquip.Quality === 1){
             HudText.PCChestEquipText.addColor("#ffffff", 0)
         }
-        else if (PC.PCChestEquip.Quality == 1.5){
+        else if (PC.PCChestEquip.Quality === 1.5){
             HudText.PCChestEquipText.addColor("#0063ff", 0)
         }
-        else if (PC.PCChestEquip.Quality == 2){
+        else if (PC.PCChestEquip.Quality === 2){
             HudText.PCChestEquipText.addColor("#9600ff", 0)
         }
-        else if (PC.PCChestEquip.Quality == 3){
+        else if (PC.PCChestEquip.Quality === 3){
             HudText.PCChestEquipText.addColor("#ff7f00", 0)
         }
         ChestPassivesString = "";
@@ -94,13 +109,13 @@ function UpdateHudElements(game, HudText, PC, enemy) {
         if (PC.PCWeaponEquip.Quality === 1){
             HudText.PCWeaponEquipText.addColor("#ffffff", 0)
         }
-        else if (PC.PCWeaponEquip.Quality == 1.5){
+        else if (PC.PCWeaponEquip.Quality === 1.5){
             HudText.PCWeaponEquipText.addColor("#0063ff", 0)
         }
-        else if (PC.PCWeaponEquip.Quality == 2){
+        else if (PC.PCWeaponEquip.Quality === 2){
             HudText.PCWeaponEquipText.addColor("#9600ff", 0)
         }
-        else if (PC.PCWeaponEquip.Quality == 3){
+        else if (PC.PCWeaponEquip.Quality === 3){
             HudText.PCWeaponEquipText.addColor("#ff7f00", 0)
         }
         WeaponPassivesString = "";
@@ -120,6 +135,10 @@ function UpdateHudElements(game, HudText, PC, enemy) {
     else {
         HudText.PCWeaponEquipText.setText("You have no weapon equipped.")
     }
+
+    HudText.FloorNo.setText ("Floor " + CurrentFloor);
+
+
     //HudText.PCWeaponEquipText.setText("Your helmet gives you " + PC.PCHeadEquip.PCSTRStat + " STR " + HeadPassivesString + "Your chestplate gives you " + PC.PCChestEquip.PCSTRStat + " STR " + ChestPassivesString + "Your weapon gives you " + PC.PCWeaponEquip.PCSTRStat + " STR " + WeaponPassivesString);
 
     //HudText.EnemyHP.setText("Enemy HP is " + enemy.ENHP);

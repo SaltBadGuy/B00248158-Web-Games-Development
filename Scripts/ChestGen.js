@@ -41,7 +41,7 @@ function GenerateLoot(game, EquipID, ChestID, PC){
     RNG = parseInt((Math.random()) * 2, 10);
 
     console.log ("RNG for loot gen is " + RNG);
-    if (RNG == 0) {
+    if (RNG === 0) {
         console.log("Generating Equipment for Chest " + ChestID);
         Loot = GenerateEquip(game, EquipID, PC);
         console.log(Loot);
@@ -67,13 +67,13 @@ function GenerateEquip(game, EquipID, PC){
     var Quality = GenerateQuality();
     console.log("The Quality multiplier is " + Quality);
     var GotEquip = true;
-    if (EquipType == "Helmet") {
+    if (EquipType === "Helmet") {
         var PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 5;
     }
-    else if (EquipType == "ChestPlate"){
+    else if (EquipType === "ChestArmour"){
         PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 15;
     }
-    else if (EquipType == "Weapon"){
+    else if (EquipType === "Weapon"){
         PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 25;
     }
     var Passive = GeneratePassive(Quality);
