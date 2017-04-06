@@ -31,6 +31,7 @@
         <script src="Scripts/PCMovement.js" type="text/javascript"></script>
         <script src="Scripts/CollisionHandlers.js" type="text/javascript"></script>
         <script src="Scripts/Combat.js" type="text/javascript"></script>
+        <script src="Scripts/ActiveItems.js" type="text/javascript"></script>
 
 
 
@@ -73,10 +74,14 @@
         var keyK;
         var keyL;
         var keyM;
+        var keyZ;
+        var keyX;
         var keyC;
 
         //Player character and its stats
         var PC;
+
+        var CurrentFloor = 1;
 
         //IDs, used to keep track of instances of objects
         var EquipID = 0;
@@ -119,6 +124,7 @@
 
         var Turn;
         var timerEvents = [];
+        var textEvents = [];
 
         var Element1 = "aaa";
         var Element2 = "bbb";
@@ -183,9 +189,11 @@
 
             GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC);
 
+            PC = SpawnPlayer(game, height, width, GridArr, scalenum);
+
             GenerateThings(game, height, width, GridArr, EnemyArr, EnemyID, ChestArr, ChestID, EquipID, scalenum, PC);
 
-            PC = SpawnPlayer(game, height, width, GridArr, scalenum);
+
 
             console.log(PC);
 
@@ -201,6 +209,7 @@
             Turn = true;
 
             var combatTimer = this.game.time.create(true);
+            var combatTextTimer = this.game.time.create(true);
 
                 //Creates a PCHeadEquip (A helmet)
                 PCHeadEquip = new PCEquipProto;
@@ -225,29 +234,28 @@
                 game.physics.arcade.enable(EnemyArr[i]);
             }
 
-
-            HudText = new HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr);
+            HudText = new HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor);
 
             //Capture input for controlling player.
             //NOTE: This captures the initial press of the key. This is intended as the movement is grid-based and this prevents players from accidentally moving more squares than they need to.
             keyUp = game.input.keyboard.addKey(Phaser.Keyboard.W);
             keyUp.onDown.add(function(){
-                PCMoveUp(PC);
+                PCMoveUp(PC, game, GridArr, InCombat);
             }, this);
 
             keyDown = game.input.keyboard.addKey(Phaser.Keyboard.S);
             keyDown.onDown.add(function(){
-                PCMoveDown(PC);
+                PCMoveDown(PC, game, GridArr, InCombat);
             }, this);
 
             keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.A);
             keyLeft.onDown.add(function(){
-                PCMoveLeft(PC);
+                PCMoveLeft(PC, game, GridArr, InCombat);
             }, this);
             
             keyRight = game.input.keyboard.addKey(Phaser.Keyboard.D);
             keyRight.onDown.add(function(){
-                PCMoveRight(PC);
+                PCMoveRight(PC, game, GridArr, InCombat);
             }, this);
 
             //Capture input for debug purposes
@@ -273,11 +281,23 @@
             keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
             keyM.onDown.add(HurtPlayer, this);
 
-            //Test Combat
+            //Activate Potion
+            keyZ = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+            keyZ.onDown.add(function() {
+                ActivatePotion(PC);
+            }, this);
+
+            //Activate Pick
+            keyX = game.input.keyboard.addKey(Phaser.Keyboard.X);
+            keyX.onDown.add(function(){
+                ActivatePick(PC);
+            }, this);
+
+            //Activate Curse
             keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
             keyC.onDown.add(function(){
-                TestCombat(game, PC, timerEvents, EnemyArr), this
-            });
+                ActivateCurse(PC);
+            }, this);
 
 
             game.input.keyboard.removeKeyCapture(Phaser.Keyboard.W);
@@ -321,7 +341,7 @@
             PC.PCPATK = Math.floor(20 + (0.2 * PC.PCSTR));
             PC.PCPDEF = Math.floor(5 + (0.1 * PC.PCSTR));
 
-            PC.PCMAXHP = Math.floor(100 + (0.5 * PC.PCSTR));
+            PC.PCMAXHP = Math.floor(PC.BaseMaxHP + (0.5 * PC.PCSTR));
 
             //If the player's current HP exceeds the max HP, cut it down to the max HP
             if (PC.PCCURHP > PC.PCMAXHP){
@@ -330,15 +350,17 @@
             }
 
             //Check if the MAXHP has changed during this step and if the player was at full health before update the CURHP to match the new MAXHP
-            if (PC.PCMAXHP != PrevMAXHP) {
-                if (PC.PCCURHP == PrevMAXHP) {
+            if (PC.PCMAXHP !== PrevMAXHP) {
+                if (PC.PCCURHP === PrevMAXHP) {
                     PC.PCCURHP = PC.PCMAXHP;
                     console.log("Player was at full health before, matching their hp to their new maximum");
                 }
             }
 
+            Math.round(PC.PCCURHP);
 
-            UpdateHudElements(game, HudText, PC, EnemyArr[0]);
+
+            UpdateHudElements(game, HudText, PC, EnemyArr[0], CurrentFloor);
 
             for (var i = 0; i < ChestArr.length; i++) {
                 //console.log(PC.pcsprite);
@@ -351,7 +373,7 @@
                 if (EnemyArr[i].enemysprite.input.pointerOver()){
                     //Element1 = "Enemy HP is " + EnemyArr[i].ENHP;
                 }
-                game.physics.arcade.collide(PC.pcsprite, EnemyArr[i].enemysprite, function(){ColliderEnemy(game, timerEvents, PC, EnemyArr[i], InCombat, Turn)}, null, this);
+                game.physics.arcade.collide(PC.pcsprite, EnemyArr[i].enemysprite, function(){ColliderEnemy(game, timerEvents, textEvents, PC, EnemyArr[i], InCombat, Turn)}, null, this);
             }
             //UpdateHudElements(game, HudText(), setText(), PC, enemy);
         }

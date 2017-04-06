@@ -2,19 +2,19 @@
  * Created by Callum on 05/03/2017.
  */
 
-function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr) {
+function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor) {
     console.log(game);
     console.log(PC);
     var HUDWidth = gridwidthgap;
     var HUDHeight = gridheightgap;
-    this.PCHPText = game.add.text((gridwidthgap/2), 30, "HP = " + PC.PCCURHP + "/" + PC.PCMAXHP + ".", {
+    this.PCHPText = game.add.text((gridwidthgap/2), 30, "HP = " + Math.round(PC.PCCURHP) + "/" + PC.PCMAXHP + ".", {
         font: "24px alphabeta",
         fill: "#f8edff",
         align: "center"
     });
     this.PCHPText.anchor.setTo(0.5, 0.5);
     //Displays the player's strength
-    this.PCSTRText = game.add.text((gridwidthgap/2), 60, "STR = " + PC.PCSTR + ".", {
+    this.PCSTRText = game.add.text((gridwidthgap/2), 60, "STR = " + Math.round(PC.PCSTR) + ".", {
         font: "24px alphabeta",
         fill: "#ff0019",
         align: "center"
@@ -22,14 +22,14 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr) {
     this.PCSTRText.anchor.setTo(0.5, 0.5);
 
     //Displays the player's physical attack
-    this.PCPATKText = game.add.text((gridwidthgap/2), 90, "ATK = " + PC.PCPATK + ".", {
+    this.PCPATKText = game.add.text((gridwidthgap/2), 90, "ATK = " + Math.round(PC.PCPATK) + ".", {
         font: "24px alphabeta",
         fill: "#ff7000",
         align: "center"
     });
     this.PCPATKText.anchor.setTo(0.5, 0.5);
     //Displays the player's physical defence
-    this.PCPDEFText = game.add.text((gridwidthgap/2), 120, "DEF = " + PC.PCPDEF + ".", {
+    this.PCPDEFText = game.add.text((gridwidthgap/2), 120, "DEF = " + Math.round(PC.PCPDEF) + ".", {
         font: "24px alphabeta",
         fill: "#ffd100",
         align: "center"
@@ -56,6 +56,29 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr) {
         align: "center"
     });
     this.PCCursesText.anchor.setTo(0.5, 0.5);
+
+    this.PCPickActive = game.add.text((gridwidthgap/3), 200, "Pick Active!", {
+        font: "12px alphabeta",
+        fill: "#B8CCAE",
+        align: "center",
+        wordWrapWidth: gridwidthgap,
+        wordWrap: true,
+        alpha: 1
+    });
+    this.PCPickActive.anchor.setTo(0.5, 0.5);
+
+    this.PCCurseActive = game.add.text((gridwidthgap/3) * 2, 200, "Curse Active!", {
+        font: "12px alphabeta",
+        fill: "#B8CCAE",
+        align: "center",
+        wordWrapWidth: gridwidthgap,
+        wordWrap: true,
+        alpha: 1
+    });
+    this.PCCurseActive.anchor.setTo(0.5, 0.5);
+
+
+
     //Displays the stats of the player's head equipment (if any). Defaults to not wearing anything
     this.PCHeadEquipText = game.add.text((gridwidthgap/2), 225, "You have no helmet equipped.", {
         font: "12px alphabeta",
@@ -90,6 +113,14 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr) {
     this.PCWeaponEquipText.anchor.setTo(0.5, 0.5);
 
 
+    this.FloorNo = game.add.text((gridwidthgap/2), 500, "Floor " + CurrentFloor, {
+        font: "36px alphabeta",
+        fill: "#00c6cc",
+        align: "center",
+        wordWrapWidth: gridwidthgap,
+        wordWrap: true
+    });
+    this.FloorNo.anchor.setTo(0.5, 0.5);
 
 
     /**ENEMY STAT BLOCK */
