@@ -31,12 +31,18 @@ function CheckChest(game, PC, ChestArr, HudText, TextEvents){
     }
     else if (ChestArr.ChestLoot === "Pick" && ChestArr.Looted === false){
         console.log("Looted a pick!");
+        var Delay = {
+            Delay: -1000
+        }
         CombatTextGen(game, PC.pcsprite.x, PC.pcsprite.y, "Got a pick!", "", false, TextEvents, Delay);
         PC.PCPicks++;
         ChestArr.Looted = true;
     }
      else if (ChestArr.ChestLoot === "Curse" && ChestArr.Looted === false){
         console.log("Looted a curse!");
+        var Delay = {
+            Delay: -1000
+        }
         CombatTextGen(game, PC.pcsprite.x, PC.pcsprite.y, "Got a curse!", "", false, TextEvents, Delay);
         PC.PCCursess++;
         ChestArr.Looted = true;
@@ -65,14 +71,14 @@ function CheckChest(game, PC, ChestArr, HudText, TextEvents){
                 EquipPassivesString = "and ";
                 PassiveStringConcat = "";
                 for (i = 0; i < ChestArr.ChestLoot.EquipPassive.length; i++){
-                    PassiveStringConcat = PassiveStringConcat.concat("and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "% ");
+                    PassiveStringConcat = PassiveStringConcat.concat(" and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "%");
                     EquipPassivesString = PassiveStringConcat;
                 }
             }
             else{
-                EquipPassivesString = " ";
+                EquipPassivesString = "";
             }
-            HudText.TextElement2.setText("Contains a Helmet with " + ChestArr.ChestLoot.PCSTRStat + " STR " + EquipPassivesString);
+            HudText.TextElement2.setText("Contains a Helmet with " + ChestArr.ChestLoot.PCSTRStat + " STR" + EquipPassivesString+ ", press Space to equip");
             HudText.TextElement1.alpha = 1;
             HudText.TextElement2.alpha = 1;
 
@@ -107,14 +113,14 @@ function CheckChest(game, PC, ChestArr, HudText, TextEvents){
                 EquipPassivesString = "and ";
                 PassiveStringConcat = "";
                 for (i = 0; i < ChestArr.ChestLoot.EquipPassive.length; i++){
-                    PassiveStringConcat = PassiveStringConcat.concat("and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "% ");
+                    PassiveStringConcat = PassiveStringConcat.concat(" and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "%");
                     EquipPassivesString = PassiveStringConcat;
                 }
             }
             else{
-                EquipPassivesString = " ";
+                EquipPassivesString = "";
             }
-            HudText.TextElement2.setText("Contains a Chestplate with " + ChestArr.ChestLoot.PCSTRStat + " STR " + EquipPassivesString);
+            HudText.TextElement2.setText("Contains a Chestplate with " + ChestArr.ChestLoot.PCSTRStat + " STR" + EquipPassivesString + ", press Space to equip");
             HudText.TextElement1.alpha = 1;
             HudText.TextElement2.alpha = 1;
 
@@ -149,14 +155,14 @@ function CheckChest(game, PC, ChestArr, HudText, TextEvents){
                 EquipPassivesString = "and ";
                 PassiveStringConcat = "";
                 for (i = 0; i < ChestArr.ChestLoot.EquipPassive.length; i++){
-                    PassiveStringConcat = PassiveStringConcat.concat("and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "% ");
+                    PassiveStringConcat = PassiveStringConcat.concat("and " + ChestArr.ChestLoot.EquipPassive[i].Passive + " " + ChestArr.ChestLoot.EquipPassive[i].PassiveX + "%");
                     EquipPassivesString = PassiveStringConcat;
                 }
             }
             else{
-                EquipPassivesString = " ";
+                EquipPassivesString = "";
             }
-            HudText.TextElement2.setText("Contains a Weapon with " + ChestArr.ChestLoot.PCSTRStat + " STR " + EquipPassivesString + ", press Space to equip");
+            HudText.TextElement2.setText("Contains a Weapon with " + ChestArr.ChestLoot.PCSTRStat + " STR" + EquipPassivesString + ", press Space to equip");
             HudText.TextElement1.alpha = 1;
             HudText.TextElement2.alpha = 1;
 
@@ -217,16 +223,12 @@ function ColliderEnemy(game, timerEvents, textEvents, PC, Enemy, InCombat, Turn)
  */
 function ColliderStairs(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC, StairObject, EnemyID, ChestID, EquipID, CurrentFloor, HudText){
     console.log("Stair Collision!");
-    HudText.TextElement1.setText("Staircase");
-    HudText.TextElement2.setText("Press Space to go to the next floor");
-    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+
         var ReturnStuff;
         ReturnStuff = PlayGen(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC, StairObject, EnemyID, ChestID, EquipID, CurrentFloor);
         console.log(ReturnStuff);
         HudText.TextElement1.alpha = 0;
         HudText.TextElement2.alpha = 0;
         return ReturnStuff;
-
-        }
 }
 

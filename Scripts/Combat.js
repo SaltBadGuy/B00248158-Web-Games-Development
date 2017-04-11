@@ -23,6 +23,8 @@ function Combat(game, combatEvent, textEvents, Player, Enemy, InCombat) {
     }
     console.log("At the start of combat, player HP was at " + Player.PCCURHP);
     console.log("At the start of combat, enemy HP was at " + Enemy.ENHP);
+    Player.pcsprite.x -= 16;
+    Enemy.enemysprite.x += 16;
     combatEvent.push(game.time.events.loop(1000, function () {
         WhoAttacks(game, combatEvent, textEvents, Player, Enemy, CombatTurn, Burn, InCombat, Delay)
     }, this));
@@ -61,7 +63,6 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
     console.log(Delay.Delay);
     Delay.Delay = 0;
 
-
     if (Player.PCCURHP < 1 || Enemy.ENHP < 1 || Player.CursesActive === true) {
         console.log("Ending combat");
         if (Player.PCCURHP <= 0) {
@@ -72,6 +73,7 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
         }
         if (Enemy.ENHP <= 0) {
             console.log("Destroying Enemy");
+            Player.pcsprite.x += 16;
             Enemy.enemysprite.destroy();
             game.time.events.removeAll(combatEvent);
             InCombat.InCombat = false;
@@ -80,8 +82,10 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
             console.log("Cursed the enemy! Insta-kill!");
             Enemy.enemysprite.destroy();
             game.time.events.removeAll(combatEvent);
+            Player.pcsprite.x += 16;
             InCombat.InCombat = false;
             Player.CursesActive = false;
+            Delay.Delay = -1000;
             new CombatTextGen(game, Enemy.enemysprite.x + 32, Enemy.enemysprite.y, "Cursed! Insta-kill!", "", Turn, textEvents, Delay);
 
         }
@@ -133,10 +137,9 @@ function DealDamage(game, P, A, D, AATK, DDEF, Burn, Turn, combatEvents, textEve
 
 function CombatTextGen(game, x, y, message, number, Turn, textEvents, Delay){
     console.log(Delay.Delay);
-    var BaseDelay = 1000;
     Delay.Delay += 200;
     console.log(Delay.Delay);
-    textEvents.push(game.time.events.add(BaseDelay + Delay.Delay, function (){
+    textEvents.push(game.time.events.add(Delay.Delay, function (){
         GenerateText(game, x, y, message, number, Turn, textEvents, Delay)},this
     ));
 
@@ -157,12 +160,19 @@ function GenerateText(game, x, y, message, number, Turn, textEvents, Delay){
     else{
         Math.round(number);
     }
+
+    var BaseDelay = 1000;
     var combatText = game.add.text(x, y - 32, message + number, {font: combatTextFont, fill: Color, stroke: "#ffffff", strokeThickness: 2});
     combatText.anchor.setTo(0.5, 0);
     combatText.align = 'center';
     console.log(textEvents);
-    game.add.tween(combatText).to( {y: '-300' }, 1500, Phaser.Easing.Linear.none, true);
-    textEvents.push(game.time.events.add(1500, function (){
+    if (y < 288) {
+        game.add.tween(combatText).to({y: 300}, 1500, Phaser.Easing.Linear.none, true);
+    }
+    else{
+        game.add.tween(combatText).to({y: -300}, 1500, Phaser.Easing.Linear.none, true);
+    }
+    textEvents.push(game.time.events.add(1000, function (){
         DestroyText(combatText)
     }, this));
 }

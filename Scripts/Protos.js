@@ -68,7 +68,7 @@ function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCS
     this.Type = TypeParam;
     this.Quality = QualityParam;
     this.GotEquip = GotEquipParam;
-    this.PCSTRStat = PCSTRStatParam;
+    this.PCSTRStat = Math.round(PCSTRStatParam);
     this.EquipPassive = PassiveParam;
 }
 /**
