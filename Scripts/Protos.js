@@ -34,7 +34,7 @@ function PCCharProto(game, GridArr, xpos, ypos, GridX, GridY, scalenum) {
     this.PCPDEF = 5 + (0.1 * this.PCSTR);
 
     //Once all stats have been set (mainly STR in this build) recalculate max HP and set current HP to match.
-    this.BaseMaxHP = 300
+    this.BaseMaxHP = 300;
     this.PCMAXHP = this.BaseMaxHP + (0.5 * this.PCSTR);
     console.log("PCCURHP at the start of creation is " + this.PCCURHP);
     this.PCCURHP = this.PCMAXHP;
@@ -49,6 +49,7 @@ function PCCharProto(game, GridArr, xpos, ypos, GridX, GridY, scalenum) {
     this.PCChestEquip = Object;
     this.PCWeaponEquip = Object;
     game.physics.enable(this.pcsprite, Phaser.Physics.ARCADE);
+    this.pcsprite.inputEnabled = true;
 
 
 }
@@ -71,7 +72,7 @@ function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCS
     this.EquipPassive = PassiveParam;
 }
 /**
- *
+ * Enemy Prototype, is used in EnemyGen
  * @param game
  * @param xpos
  * @param ypos
@@ -83,7 +84,17 @@ function PCEquipProto(game, IDParam, TypeParam, QualityParam, GotEquipParam, PCS
  * @constructor
  */
 function EnemyProto(game, xpos, ypos, IDParam, QualityParam, ENSTRStatParam, PassiveParam, scalenum) {
-    this.enemysprite = game.add.sprite(xpos, ypos, 'DHEnemy');
+    var RNG = parseInt((Math.random() *  3), 10);
+    console.log("When generating enemy sprite, RNG was " + RNG);
+    if (RNG === 0) {
+        this.enemysprite = game.add.sprite(xpos, ypos, 'DH0');
+    }
+    else if (RNG === 1){
+        this.enemysprite = game.add.sprite(xpos, ypos, 'DH1');
+    }
+    else if (RNG === 2){
+        this.enemysprite = game.add.sprite(xpos, ypos, 'DH2');
+    }
     console.log(this.enemysprite);
     this.enemysprite.scale.setTo(scalenum, scalenum);
     this.Quality = QualityParam;
@@ -94,18 +105,13 @@ function EnemyProto(game, xpos, ypos, IDParam, QualityParam, ENSTRStatParam, Pas
     this.ENSTR = this.ENSTRStat;
     console.log(PassiveParam);
     this.ENPassive = PassiveParam;
-    /*this.ENPassive = {
-     ID: IDParam,
-     Passive: PassiveParam,
-     PassiveX:PassiveXParam
-     };*/
     game.physics.enable(this.enemysprite, Phaser.Physics.ARCADE);
     this.enemysprite.inputEnabled = true;
 
 }
 
 /**
- *
+ * Tile Prototype, used by MakeObject mainly.
  * @param game
  * @param xpos
  * @param ypos
@@ -126,6 +132,16 @@ function TileProto(game, xpos, ypos, basetile, scalenum){
     //this.TileSprite.scale.setTo(scalenum, scalenum);
 }
 
+/**
+ * Chest Prototype, used in ChestGen.
+ * @param game
+ * @param IDParam
+ * @param xpos
+ * @param ypos
+ * @param loot
+ * @param scalenum
+ * @constructor
+ */
 function ChestProto(game, IDParam, xpos, ypos, loot, scalenum){
     this.ID = IDParam;
     this.Looted = false;
@@ -133,11 +149,34 @@ function ChestProto(game, IDParam, xpos, ypos, loot, scalenum){
     this.chestsprite.scale.setTo(scalenum, scalenum);
     this.ChestLoot = loot;
     console.log(this.ChestLoot);
-    game.physics.enable(this.chestsprite, Phaser.Physics.ARCADE);
+    game.physics.enable(this.chestsprite, Phaser.Physics.ARCADE)
+    this.chestsprite.inputEnabled = true;
+
 
 }
-
-function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, spritenametwo, spritenamethree, spritenamefour, spritenamefive, spritenamesix, scalenum, PCParam, EnemyArr, ChestArr) {
+/**
+ * Iterates through the grid and creates the map. This originally generated all objects but those functions were moved to be their own things, so this mainly creates floor tiles, wall and bedrock tiles and a staircase
+ * @param game
+ * @param obj
+ * @param GridX
+ * @param GridY
+ * @param xpos
+ * @param ypos
+ * @param spritenamezero
+ * @param spritenameone
+ * @param spritenametwo
+ * @param spritenamethree
+ * @param spritenamefour
+ * @param spritenamefive
+ * @param spritenamesix
+ * @param scalenum
+ * @param PCParam
+ * @param EnemyArr
+ * @param ChestArr
+ * @param StairObject
+ * @constructor
+ */
+function MakeObject(game, obj, GridX, GridY, xpos, ypos, spritenamezero, spritenameone, spritenametwo, spritenamethree, spritenamefour, spritenamefive, spritenamesix, scalenum, PCParam, EnemyArr, ChestArr, StairObject) {
     console.log("The Tiletype is " + obj.TileType);
 
     if (obj.TileType === 0) {
@@ -160,7 +199,13 @@ function MakeObject(game, obj, xpos, ypos, spritenamezero, spritenameone, sprite
         console.debug("Generating player");
     }
     else if (obj.TileType === 6) {
-        obj.TileSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamesix);
-        obj.TileSprite.scale.setTo(scalenum, scalenum);
+        console.log("Spawning Staircase");
+        //if (Object.getOwnPropertyNames(StairObject).length === 0){
+            obj.TileX = GridX;
+            obj.TileY = GridY;
+            obj.StairSprite = game.add.sprite(obj.TileXPos, obj.TileYPos, spritenamesix);
+            obj.StairSprite.scale.setTo(scalenum, scalenum);
+            game.physics.enable(obj.StairSprite, Phaser.Physics.ARCADE);
+            obj.StairSprite.inputEnabled = true;
     }
 }

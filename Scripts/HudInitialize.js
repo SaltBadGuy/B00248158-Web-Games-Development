@@ -2,58 +2,66 @@
  * Created by Callum on 05/03/2017.
  */
 
-function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor) {
+function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor, Element1, Element2) {
     console.log(game);
     console.log(PC);
     var HUDWidth = gridwidthgap;
     var HUDHeight = gridheightgap;
     this.PCHPText = game.add.text((gridwidthgap/2), 30, "HP = " + Math.round(PC.PCCURHP) + "/" + PC.PCMAXHP + ".", {
         font: "24px alphabeta",
-        fill: "#f8edff",
-        align: "center"
+        fill: "#6e0a00",
+        align: "center",
+        stroke: '#ffffff',
+        strokeThickness: 2
     });
     this.PCHPText.anchor.setTo(0.5, 0.5);
     //Displays the player's strength
     this.PCSTRText = game.add.text((gridwidthgap/2), 60, "STR = " + Math.round(PC.PCSTR) + ".", {
         font: "24px alphabeta",
         fill: "#ff0019",
-        align: "center"
+        align: "center",
+        stroke: '#f8edff',
+        strokeThickness: 2
     });
     this.PCSTRText.anchor.setTo(0.5, 0.5);
 
     //Displays the player's physical attack
     this.PCPATKText = game.add.text((gridwidthgap/2), 90, "ATK = " + Math.round(PC.PCPATK) + ".", {
         font: "24px alphabeta",
-        fill: "#ff7000",
-        align: "center"
+        fill: "#ff0019",
+        align: "center",
+        stroke: '#fff8f9',
+        strokeThickness: 2
     });
     this.PCPATKText.anchor.setTo(0.5, 0.5);
     //Displays the player's physical defence
     this.PCPDEFText = game.add.text((gridwidthgap/2), 120, "DEF = " + Math.round(PC.PCPDEF) + ".", {
         font: "24px alphabeta",
-        fill: "#ffd100",
-        align: "center"
+        fill: "#ff0019",
+        align: "center",
+        stroke: '#fff8f9',
+        strokeThickness: 2
     });
     this.PCPDEFText.anchor.setTo(0.5, 0.5);
     this.PCHPText.anchor.setTo(0.5, 0.5);
     this.PCPotsText = game.add.text((gridwidthgap/3), 150, "Potions: " + PC.PCPots, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center"
+        align: "center",
     });
     this.PCPotsText.anchor.setTo(0.5, 0.5);
 
     this.PCPicksText = game.add.text((gridwidthgap/3) * 2, 150, "Picks: " + PC.PCPicks, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center"
+        align: "center",
     });
     this.PCPicksText.anchor.setTo(0.5, 0.5);
 
     this.PCCursesText = game.add.text((gridwidthgap/2), 180, "Curses: " + PC.PCCurses, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center"
+        align: "center",
     });
     this.PCCursesText.anchor.setTo(0.5, 0.5);
 
@@ -100,8 +108,6 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentF
     });
     this.PCChestEquipText.anchor.setTo(0.5, 0.5);
 
-
-
     //Displays the stats of the player's weapon equipment (if any). Defaults to not wearing anything
     this.PCWeaponEquipText = game.add.text((gridwidthgap/2), 325, "You have no weapon equipped.", {
         font: "12px alphabeta",
@@ -115,81 +121,38 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentF
 
     this.FloorNo = game.add.text((gridwidthgap/2), 500, "Floor " + CurrentFloor, {
         font: "36px alphabeta",
-        fill: "#00c6cc",
+        fill: "#0052cc",
         align: "center",
+        stroke: '#f8edff',
+        strokeThickness: 2,
         wordWrapWidth: gridwidthgap,
         wordWrap: true
     });
     this.FloorNo.anchor.setTo(0.5, 0.5);
 
-
-    /**ENEMY STAT BLOCK */
-    /**
-    this.EnemyHP = game.add.text(400, 475, "Enemy HP is " + EnemyArr[0].ENHP, {
+    this.TextElement1 = game.add.text((gridwidthgap/2), 375, "Element 1 is " + Element1, {
         font: "24px alphabeta",
-        fill: "#02ff00",
-        align: "center"
+        fill: "#7535ff",
+        align: "center",
+        stroke: '#f8edff',
+        strokeThickness: 2,
+        wordWrapWidth: gridwidthgap,
+        wordWrap: true
     });
-    this.EnemyHP.anchor.setTo(0.5, 0.5);
+    this.TextElement1.alpha = 0;
+    this.TextElement1.anchor.set(0.5, 0.5);
+    //this.TextElement1.wordWrap = true;
 
-    this.EnemyPassive = game.add.text(400, 450, "Enemy Passive is " + EnemyArr[0].ENPassive.Passive + " " + EnemyArr[0].ENPassive.Passive + "%", {
-        font: "24px alphabeta",
-        fill: "#02ff00",
-        align: "center"
+    this.TextElement2 = game.add.text((gridwidthgap/2), 425, "Element 2 is " + Element2, {
+        font: "18px alphabeta",
+        fill: "#b400ff",
+        align: "center",
+        stroke: '#f8edff',
+        strokeThickness: 2,
+        wordWrapWidth: gridwidthgap,
+        wordWrap: true
     });
-    this.EnemyPassive.anchor.setTo(0.5, 0.5);
-
-    this.EnemySTR = game.add.text(400, 500, "Enemy STR is " + EnemyArr.ENSTR, {
-        font: "24px alphabeta",
-        fill: "#02ff00",
-        align: "center"
-    });
-    this.EnemySTR.anchor.setTo(0.5, 0.5);
-
-    this.EnemyATK = game.add.text(400, 525, "Enemy ATK is " + EnemyArr.ENPATK, {
-        font: "24px alphabeta",
-        fill: "#02ff00",
-        align: "center"
-    });
-    this.EnemyATK.anchor.setTo(0.5, 0.5);
-    this.EnemyDEF = game.add.text(400, 550, "Enemy DEF is " + EnemyArr.ENPDEF, {
-        font: "24px alphabeta",
-        fill: "#02ff00",
-        align: "center"
-    });
-    this.EnemyDEF.anchor.setTo(0.5, 0.5);
-
-     TextElement2 = game.add.text(600, 300, "Element 2 is " + Element2, {
-                font: "24px alphabeta",
-                fill: "#7535ff",
-                align: "center"
-            });
-     TextElement2.anchor.set(0.5);
-     TextElement2.wordWrap = true;
-
-     TextElement3 = game.add.text(700, 300, "Element 3 is " + Element3, {
-                font: "24px alphabeta",
-                fill: "#7535ff",
-                align: "center"
-            });
-     TextElement3.anchor.set(0.5);
-     TextElement3.wordWrap = true;
-
-     TextElement4 = game.add.text(550, 200, "Element 4 is " + Element4, {
-                font: "24px alphabeta",
-                fill: "#7535ff",
-                align: "center"
-            });
-     TextElement4.anchor.set(0.5);
-     TextElement4.wordWrap = true;
-
-     TextElement5 = game.add.text(650, 200, "Element 5 is " + Element5, {
-                font: "24px alphabeta",
-                fill: "#7535ff",
-                align: "center"
-            });
-     TextElement5.anchor.set(0.5);
-     TextElement5.wordWrap = true;
-
-     */
+    this.TextElement2.alpha = 0;
+    this.TextElement2.anchor.set(0.5, 0.5);
+    //this.TextElement2.wordWrap = true;
 }

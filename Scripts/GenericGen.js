@@ -15,7 +15,7 @@
 function GenerateQuality() {
     var RNG = parseInt((Math.random() *  100), 10);
     console.log("RNG for quality was rolled as " + RNG);
-    if (RNG == 1) {
+    if (RNG === 1) {
         return 3;
     }
     else if (RNG > 1 && RNG < 11) {
@@ -36,7 +36,7 @@ function GenerateQuality() {
  * -ID is used to keep track of what items give what passives
  * The Quality multiplier determines how many passives are made
  * If the Quality multiplier is 1 (Common), no passives are generated.
- * -
+ * @param IDParam
  * @param Quality
  * @return {string}
  * @constructor
@@ -48,16 +48,16 @@ function GeneratePassive(IDParam, Quality){
     var PassiveArray = [
         "Lifesteal", "Critical", "Burn", "Parry"
     ];
-    if (Quality == 1){
+    if (Quality === 1){
         PassiveAmount = 0;
     }
-    else if (Quality == 1.5){
+    else if (Quality === 1.5){
         PassiveAmount = 1;
     }
-    else if (Quality == 2){
+    else if (Quality === 2){
         PassiveAmount = 2;
     }
-    else if (Quality == 3){
+    else if (Quality === 3){
         PassiveAmount = 3;
     }
     for (var i = 0; i < PassiveAmount; i++){
@@ -82,33 +82,6 @@ function NewPassive(IDParam, PassiveArray, Quality) {
     GeneratedPassive.PassiveX = Quality * (Math.floor(Math.random() * 5)) + 1;
     return GeneratedPassive;
 }
-
-/**
- *
- * @param ChosenPassive
- * @param Quality
- * @return {number}
- * @constructor
- */
-/*function GeneratePassiveX(ChosenPassive, Quality){
-    var ChosenPassivesX = [];
-    if (Quality == 1){
-        PassiveAmount = 0;
-    }
-    else if (Quality == 1.5){
-        PassiveAmount = 1;
-    }
-    else if (Quality == 2){
-        PassiveAmount = 2;
-    }
-    else if (Quality == 3){
-        PassiveAmount = 3;
-    }
-    ChosenPassivesX.push(Quality * (Math.floor(Math.random()*5)) + 1);
-
-    return ChosenPassivesX;
-}
-*/
 
 /**
  *

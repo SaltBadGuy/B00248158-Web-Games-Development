@@ -9,7 +9,7 @@ function PCMoveUp(PC, game, GridArr, InCombat){
         TryMove = false;
         console.log("Before moving the grid was (" + PC.GridX + "," + PC.GridY + ")");
         if (GridArr[PC.GridX][PC.GridY - 1].TileType === 2 || GridArr[PC.GridX][PC.GridY - 1].TileType === 1) {
-            if(PC.PicksActive === true && GridArr[PC.GridX][PC.GridY + 1].TileType === 2){
+            if(PC.PicksActive === true && GridArr[PC.GridX][PC.GridY - 1].TileType === 2){
                 console.log("Destroying Wall!");
                 GridArr[PC.GridX][PC.GridY - 1].TileSprite.kill();
                 GridArr[PC.GridX][PC.GridY - 1].TileType = 0;

@@ -14,9 +14,9 @@
  * @param PC
  * @constructor
  */
-function GenerateChest(game, ChestID, EquipID, xpos, ypos, ChestArr, scalenum, PC){
+function GenerateChest(game, ChestID, EquipID, xpos, ypos, ChestArr, scalenum, PC,CurrentFloor){
     console.log(PC); //Shows PCProto, as intended
-    var loot = GenerateLoot(game, EquipID, ChestID, PC);
+    var loot = GenerateLoot(game, EquipID, ChestID, PC, CurrentFloor);
     console.log(loot); //Shows GenerateLoot
     var GeneratedChest = new ChestProto(game, ChestID, xpos, ypos, loot, scalenum);
     console.log("Generated Chest is " + GeneratedChest.ChestLoot);
@@ -35,7 +35,7 @@ function GenerateChest(game, ChestID, EquipID, xpos, ypos, ChestArr, scalenum, P
  * @return {*}
  * @constructor
  */
-function GenerateLoot(game, EquipID, ChestID, PC){
+function GenerateLoot(game, EquipID, ChestID, PC, CurrentFloor){
     console.log(PC); //Shows Undefined
     var Loot;
     RNG = parseInt((Math.random()) * 2, 10);
@@ -43,7 +43,7 @@ function GenerateLoot(game, EquipID, ChestID, PC){
     console.log ("RNG for loot gen is " + RNG);
     if (RNG === 0) {
         console.log("Generating Equipment for Chest " + ChestID);
-        Loot = GenerateEquip(game, EquipID, PC);
+        Loot = GenerateEquip(game, EquipID, PC, CurrentFloor);
         console.log(Loot);
         return Loot;
     }
@@ -62,21 +62,21 @@ function GenerateLoot(game, EquipID, ChestID, PC){
  * @return {PCEquipProto}
  * @constructor
  */
-function GenerateEquip(game, EquipID, PC){
+function GenerateEquip(game, EquipID, PC, CurrentFloor){
     var EquipType = GenerateType();
     var Quality = GenerateQuality();
     console.log("The Quality multiplier is " + Quality);
     var GotEquip = true;
     if (EquipType === "Helmet") {
-        var PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 5;
+        var PCSTRStat = (1 + (CurrentFloor/20)) * (Quality * parseInt((Math.random() *  10), 10) + 5);
     }
     else if (EquipType === "ChestArmour"){
-        PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 15;
+        PCSTRStat = (1 + (CurrentFloor/20)) *  (Quality * parseInt((Math.random() *  10), 10) + 15);
     }
     else if (EquipType === "Weapon"){
-        PCSTRStat = Quality * parseInt((Math.random() *  10), 10) + 25;
+        PCSTRStat = (1 + (CurrentFloor/20)) *  (Quality * parseInt((Math.random() *  10), 10) + 25);
     }
-    var Passive = GeneratePassive(Quality);
+    var Passive = GeneratePassive(EquipID, Quality);
     //var Passive1X = GeneratePassiveX(Passive1, Quality);
     console.log("the rolled values for a new helmet were " +  Quality + ", " +  GotEquip + ", " +  PCSTRStat + ", " +  Passive);
     Equip = new PCEquipProto(game, EquipID, EquipType, Quality, GotEquip, PCSTRStat, Passive);

@@ -1,6 +1,15 @@
 /**
  * Created by Callum on 24/02/2017.
  */
+/**
+ * Updates the HUD every frame
+ * @param game
+ * @param HudText
+ * @param PC
+ * @param enemy
+ * @param CurrentFloor
+ * @constructor
+ */
 function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
 
     HudText.PCHPText.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
@@ -136,10 +145,5 @@ function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
         HudText.PCWeaponEquipText.setText("You have no weapon equipped.")
     }
 
-    HudText.FloorNo.setText ("Floor " + CurrentFloor);
-
-
-    //HudText.PCWeaponEquipText.setText("Your helmet gives you " + PC.PCHeadEquip.PCSTRStat + " STR " + HeadPassivesString + "Your chestplate gives you " + PC.PCChestEquip.PCSTRStat + " STR " + ChestPassivesString + "Your weapon gives you " + PC.PCWeaponEquip.PCSTRStat + " STR " + WeaponPassivesString);
-
-    //HudText.EnemyHP.setText("Enemy HP is " + enemy.ENHP);
+    HudText.FloorNo.setText("Floor " + CurrentFloor);
 }
