@@ -15,13 +15,13 @@
  * @param scalenum
  * @constructor
  */
-function GenerateThings(game, height, width, GridArr, EnemyArr, EnemyID, ChestArr, ChestID, EquipID, scalenum, PC) {
+function GenerateThings(game, height, width, GridArr, EnemyArr, EnemyID, ChestArr, ChestID, EquipID, scalenum, PC, CurrentFloor) {
     for (i = 0; i < (height); i++) {
         for (j = 0; j < (width); j++) {
             if (GridArr[i][j].TileType === 3) {
                 /**Generates a chest object which is pushed into the ChestArr array.*/
                 console.log(PC);
-                GenerateChest(game, ChestID, EquipID, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, ChestArr, scalenum, PC);
+                GenerateChest(game, ChestID, EquipID, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, ChestArr, scalenum, PC, CurrentFloor);
                 ChestID++;
                 /**If the chest generated a Equipment, the EquipID gets increased to match.*/
                 if (ChestArr[ChestArr.length - 1].ChestLoot instanceof PCEquipProto) {
@@ -32,7 +32,7 @@ function GenerateThings(game, height, width, GridArr, EnemyArr, EnemyID, ChestAr
             }
             else if (GridArr[i][j].TileType === 4) {
                 /**Generates a Enemy object which is pushed into the EnemyArr array.*/
-                GenerateEnemy(game, EnemyID, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, EnemyArr, scalenum);
+                GenerateEnemy(game, EnemyID, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, EnemyArr, scalenum, CurrentFloor);
                 console.log(EnemyID);
             }
         }

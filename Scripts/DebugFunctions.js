@@ -54,5 +54,5 @@ function TestCombat(game, PC, timerEvents, EnemyArr){
 }
 
 function HurtPlayer() {
-    console.log("AAAA");
+
 }

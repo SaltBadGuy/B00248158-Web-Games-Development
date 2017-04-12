@@ -18,6 +18,7 @@
                 src: url(Assets/alphbeta.ttf);
             }
         </style>
+        <script src="Scripts/PlayGen.js" type="text/javascript"></script>
         <script src="Scripts/FloorGen.js" type="text/javascript"></script>
         <script src="Scripts/ThingGen.js" type="text/javascript"></script>
         <script src="Scripts/HudInitialize.js" type="text/javascript"></script>
@@ -51,14 +52,18 @@
             game.load.image('DHPC', 'Assets/DHPC.png');
             //Floor tile sprite
             game.load.image('DHFloor', 'Assets/DHFloor.png');
-            //Floor tile sprite
+            //Wall tile sprite
             game.load.image('DHWall', 'Assets/DHStoneWall1.png');
             //Bedrock tile sprite
             game.load.image('DHBedrock', 'Assets/DHBedrock.png');
-            //Wall tile sprite
+            //Chest Sprite
             game.load.image('DHChest', 'Assets/DHChest.png');
-            //Loot sprite
-            game.load.image('DHEnemy', 'Assets/DHSkeleton.png');
+            //Enemy 0 Sprite
+            game.load.image('DH0', 'Assets/DHZombie.png');
+            //Enemy 1 Sprite
+            game.load.image('DH1', 'Assets/DHSkeleton.png');
+            //Enemy 2 Sprite
+            game.load.image('DH2', 'Assets/DHDemon.png');
             //Staircase sprite
             game.load.image('DHStairs', 'Assets/DHStairs.png');
             //HUD sprite
@@ -79,9 +84,10 @@
         var keyC;
 
         //Player character and its stats
-        var PC;
+        var PC = {};
 
-        var CurrentFloor = 1;
+        var CurrentFloor = 0;
+        var StairObject = {};
 
         //IDs, used to keep track of instances of objects
         var EquipID = 0;
@@ -128,9 +134,6 @@
 
         var Element1 = "aaa";
         var Element2 = "bbb";
-        var Element3 = "ccc";
-        var Element4 = "ddd";
-        var Element5 = "eee";
 
         /**Floor Generation Stats*/
 
@@ -143,13 +146,9 @@
         var gridwidthgap;
         var gridheightgap;
 
-
-
         var HudText;
 
-        var bmp;
-        var totalScoreText;
-        var sprite;
+        var FloorStuff;
 
         function create () {
 
@@ -165,17 +164,6 @@
 
             EnemyArr = [];
 
-
-            bmp = game.add.bitmapData(800,600);
-            sprite = game.add.sprite(100, 100, this.bmp);
-
-            totalScoreStyle = {font: "24px Arial", fill: "#ffffff", align: "center", stroke:"#000000", strokeThickness:2};
-
-            totalScoreText = game.make.text(50, 50, 50, totalScoreStyle);
-            totalScoreText.setText("LIFESTEAL!!!");
-            bmp.draw(totalScoreText, Math.floor(bmp.width * 0.5), Math.floor(bmp.height * 0.5), null, null);
-
-
             console.log(GridArr);
 
             width = 17;
@@ -187,15 +175,23 @@
             gridwidthgap = game.canvas.width - gridwidth;
             gridheightgap = game.canvas.height - gridheight;
 
-            GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC);
-
-            PC = SpawnPlayer(game, height, width, GridArr, scalenum);
-
-            GenerateThings(game, height, width, GridArr, EnemyArr, EnemyID, ChestArr, ChestID, EquipID, scalenum, PC);
-
-
-
+            console.log(GridArr);
             console.log(PC);
+            console.log(StairObject);
+
+            FloorStuff = new PlayGen(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC, StairObject, EnemyID, ChestID, EquipID, CurrentFloor);
+
+            console.log(FloorStuff);
+
+            GridArr = FloorStuff.GridArr;
+            PC = FloorStuff.PC;
+            StairObject = FloorStuff.StairObject;
+            CurrentFloor = FloorStuff.CurrentFloor;
+
+            console.log(GridArr);
+            console.log(PC);
+            console.log(StairObject);
+            console.log(CurrentFloor);
 
             var DHHud = game.add.tileSprite(0, 0, 224, 576, 'DHHUD');
 
@@ -224,9 +220,6 @@
 
             //TODO: ENEMY STAT SCREEN
 
-            console.log(PC);
-
-
             //Enable physics for the player, this is what is used to let him move and gain a hitbox for collision detection
             
             //game.physics.arcade.enable(PC);
@@ -234,7 +227,7 @@
                 game.physics.arcade.enable(EnemyArr[i]);
             }
 
-            HudText = new HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor);
+            HudText = new HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor, Element1, Element2);
 
             //Capture input for controlling player.
             //NOTE: This captures the initial press of the key. This is intended as the movement is grid-based and this prevents players from accidentally moving more squares than they need to.
@@ -284,20 +277,21 @@
             //Activate Potion
             keyZ = game.input.keyboard.addKey(Phaser.Keyboard.Z);
             keyZ.onDown.add(function() {
-                ActivatePotion(PC);
+                ActivatePotion(PC, InCombat);
             }, this);
 
             //Activate Pick
             keyX = game.input.keyboard.addKey(Phaser.Keyboard.X);
             keyX.onDown.add(function(){
-                ActivatePick(PC);
+                ActivatePick(PC, InCombat);
             }, this);
 
             //Activate Curse
             keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
             keyC.onDown.add(function(){
-                ActivateCurse(PC);
+                ActivateCurse(PC, InCombat);
             }, this);
+            keySpace = game.input.keyboard.addKey(Phaser.Keyboard.SPACE);
 
 
             game.input.keyboard.removeKeyCapture(Phaser.Keyboard.W);
@@ -320,73 +314,150 @@
             }
 
             console.log(PC);
-
+            console.log(ChestArr);
         }
         
         
         function update () {
 
-            totalScoreText.setText(30, true);
-            bmp.clear();
-            bmp.draw(totalScoreText, Math.floor(bmp.width * 0.5), Math.floor(bmp.height * 0.5), null, null);
-
-            //Save the MAXHP at the start of the step before any changes are made
-            PrevMAXHP = PC.PCMAXHP;
-            //console.log(PC.PCCURHP);
-            //Updates all stats
-            //console.log(PCHeadEquip.PCSTRStat + PCChestEquip.PCSTRStat + PCWeaponEquip.PCSTRStat)
-            PC.PCSTR = PC.BasePCSTR + PC.PCHeadEquip.PCSTRStat + PC.PCChestEquip.PCSTRStat + PC.PCWeaponEquip.PCSTRStat;
-
-            //Refers to the player's physical attack. Is increased by Strength in the current prototype and has a base value of 20.
-            PC.PCPATK = Math.floor(20 + (0.2 * PC.PCSTR));
-            PC.PCPDEF = Math.floor(5 + (0.1 * PC.PCSTR));
-
-            PC.PCMAXHP = Math.floor(PC.BaseMaxHP + (0.5 * PC.PCSTR));
-
-            //If the player's current HP exceeds the max HP, cut it down to the max HP
-            if (PC.PCCURHP > PC.PCMAXHP){
-                console.log("Max HP exceeded, cutting down current HP");
-                PC.PCCURHP = PC.PCMAXHP;
-            }
-
-            //Check if the MAXHP has changed during this step and if the player was at full health before update the CURHP to match the new MAXHP
-            if (PC.PCMAXHP !== PrevMAXHP) {
-                if (PC.PCCURHP === PrevMAXHP) {
-                    PC.PCCURHP = PC.PCMAXHP;
-                    console.log("Player was at full health before, matching their hp to their new maximum");
+            for (i = 0; i < EnemyArr.length; i++) {
+                if (EnemyArr[i].enemysprite.input.pointerOver()) {
+                    var Title;
+                    if (EnemyArr[i].Quality === 1){
+                        Title = "Common ";
+                    }
+                    else if (EnemyArr[i].Quality === 1.5){
+                        Title = "Magical ";
+                    }
+                    else if (EnemyArr[i].Quality === 2){
+                        Title = "Epic ";
+                    }
+                    else if (EnemyArr[i].Quality === 3){
+                        Title = "Mythical ";
+                    }
+                    HudText.TextElement1.setText(Title + "Enemy");
+                    HudText.TextElement2.setText("This enemy's HP is " + Math.round(EnemyArr[i].ENHP) + " with a ATK of " + Math.round(EnemyArr[i].ENPATK) + " and a DEF of " + Math.round(EnemyArr[i].ENPDEF));
+                    HudText.TextElement1.alpha = 1;
+                    HudText.TextElement2.alpha = 1;
                 }
+                else
+                    {
+                        //bunny.alpha = 0.5;
+                    }
+                game.physics.arcade.collide(PC.pcsprite, EnemyArr[i].enemysprite, function () {
+                    ColliderEnemy(game, timerEvents, textEvents, PC, EnemyArr[i], InCombat, Turn)
+                }, null, this);
             }
-
-            Math.round(PC.PCCURHP);
-
-
-            UpdateHudElements(game, HudText, PC, EnemyArr[0], CurrentFloor);
 
             for (var i = 0; i < ChestArr.length; i++) {
-                //console.log(PC.pcsprite);
-                //console.log(ChestArr[i].chestsprite);
-                game.physics.arcade.collide(PC.pcsprite, ChestArr[i].chestsprite, function(){CheckChest(PC, ChestArr[i])}, null, this);
+                if (ChestArr[i].Looted === false) {
+                    if (ChestArr[i].chestsprite.input.pointerOver()) {
+                        HudText.TextElement1.setText("Chest");
+                        HudText.TextElement2.setText("This can contain a potion, a pick, a curse or equipment.");
+                        HudText.TextElement1.alpha = 1;
+                        HudText.TextElement2.alpha = 1;
+                    }
+                    game.physics.arcade.collide(PC.pcsprite, ChestArr[i].chestsprite, function () {
+                        CheckChest(game, PC, ChestArr[i], HudText, textEvents)
+                    }, null, this);
+                }
+                else{
+                    ChestArr[i].chestsprite.destroy();
+                }
             }
 
-            //console.log(EnemyArr.length);
-            for (i = 0; i < EnemyArr.length; i++) {
-                if (EnemyArr[i].enemysprite.input.pointerOver()){
-                    //Element1 = "Enemy HP is " + EnemyArr[i].ENHP;
-                }
-                game.physics.arcade.collide(PC.pcsprite, EnemyArr[i].enemysprite, function(){ColliderEnemy(game, timerEvents, textEvents, PC, EnemyArr[i], InCombat, Turn)}, null, this);
+            if(StairObject.StairSprite.input.pointerOver()) {
+                HudText.TextElement1.setText("Staircase");
+                HudText.TextElement2.setText("This leads you to the next floor");
+                HudText.TextElement1.alpha = 1;
+                HudText.TextElement2.alpha = 1;
             }
-            //UpdateHudElements(game, HudText(), setText(), PC, enemy);
+
+            game.physics.arcade.collide(PC.pcsprite, StairObject.StairSprite, function () {
+                ColliderStairsCall()
+            }, null, this);
+
+            if (!(typeof StairObject.StairSprite === "undefined")) {
+                game.world.bringToTop(StairObject.StairSprite);
+            }
+
+            if (!(typeof PC === "undefined")) {
+                game.world.bringToTop(PC.pcsprite);
+                if(PC.pcsprite.input.pointerOver()) {
+                    HudText.TextElement1.setText("Player");
+                    HudText.TextElement2.setText("This is you! Survive as many floors as possible!");
+                    HudText.TextElement1.alpha = 1;
+                    HudText.TextElement2.alpha = 1;
+                }
+            }
+
+            //Save the MAXHP at the start of the step before any changes are made
+            if (!(typeof PC === "undefined")) {
+                PrevMAXHP = PC.PCMAXHP;
+
+                //Updates all stats
+                PC.PCSTR = PC.BasePCSTR + PC.PCHeadEquip.PCSTRStat + PC.PCChestEquip.PCSTRStat + PC.PCWeaponEquip.PCSTRStat;
+
+                //Refers to the player's physical attack. Is increased by Strength in the current prototype and has a base value of 20.
+                PC.PCPATK = Math.floor(20 + (0.2 * PC.PCSTR));
+                PC.PCPDEF = Math.floor(5 + (0.1 * PC.PCSTR));
+
+                PC.PCMAXHP = Math.floor(PC.BaseMaxHP + (0.5 * PC.PCSTR));
+
+                //If the player's current HP exceeds the max HP, cut it down to the max HP
+                if (PC.PCCURHP > PC.PCMAXHP) {
+                    console.log("Max HP exceeded, cutting down current HP");
+                    PC.PCCURHP = PC.PCMAXHP;
+                }
+
+                //Check if the MAXHP has changed during this step and if the player was at full health before update the CURHP to match the new MAXHP
+                if (PC.PCMAXHP !== PrevMAXHP) {
+                    if (PC.PCCURHP === PrevMAXHP) {
+                        PC.PCCURHP = PC.PCMAXHP;
+                        console.log("Player was at full health before, matching their hp to their new maximum");
+                    }
+                }
+
+                Math.round(PC.PCCURHP);
+
+                UpdateHudElements(game, HudText, PC, EnemyArr[0], CurrentFloor);
+            }
+
+        }
+
+
+        function ColliderStairsCall(){
+            HudText.TextElement1.setText("Staircase");
+            HudText.TextElement2.setText("Press Space to go to the next floor");
+            HudText.TextElement1.alpha = 1;
+            HudText.TextElement2.alpha = 1;
+            if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+                FloorStuff = ColliderStairs(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC, StairObject, EnemyID, ChestID, EquipID, CurrentFloor, HudText);
+            }
+            GridArr = FloorStuff.GridArr;
+            PC = FloorStuff.PC;
+            StairObject = FloorStuff.StairObject;
+            CurrentFloor = FloorStuff.CurrentFloor;
+
+            console.log(FloorStuff);
         }
 
         function render() {
-            game.debug.body(PC.pcsprite);
-            //game.debug.body(sprite2);
+            /**
+            if(!(typeof PC === "undefined")) {
+                game.debug.body(PC.pcsprite);
+            }
+            game.debug.body(EnemyArr);
             for (var i = 0; i < ChestArr.length; i++) {
                 game.debug.body(ChestArr[i].chestsprite);
             }
-            for (var i = 0; i < EnemyArr.length; i++) {
-                game.debug.body(EnemyArr[i].enemysprite);
+            for (var j = 0; j < EnemyArr.length; j++) {
+                game.debug.body(EnemyArr[j].enemysprite);
             }
+            if(!(typeof StairObject === "undefined")) {
+                game.debug.body(StairObject.StairSprite);
+            }
+             */
         }
     }
     </script>

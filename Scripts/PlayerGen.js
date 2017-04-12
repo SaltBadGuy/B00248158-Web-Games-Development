@@ -2,13 +2,27 @@
  * Created by Callum on 02/03/2017.
  */
 
-function SpawnPlayer(game, height, width, GridArr, scalenum) {
+function SpawnPlayer(game, PC, height, width, GridArr, scalenum) {
+    console.log(GridArr);
+    console.log(PC);
     for (i = 0; i < (height); i++) {
         for (j = 0; j < (width); j++) {
             if (GridArr[i][j].TileType === 5) {
-                var GeneratedPlayer = GeneratePlayer(game, GridArr, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, i, j, scalenum);
-                console.log(GeneratedPlayer);
-                return GeneratedPlayer;
+                if (Object.getOwnPropertyNames(PC).length === 0)
+                {
+                    var GeneratedPlayer = new GeneratePlayer(game, GridArr, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, i, j, scalenum);
+                    console.log(GeneratedPlayer);
+                    PC = GeneratedPlayer;
+                    console.log(PC);
+                    return PC;
+                }
+                else{
+                    PC.GridX = i;
+                    PC.GridY = j;
+                    PC.pcsprite.x = GridArr[i][j].TileXPos;
+                    PC.pcsprite.y = GridArr[i][j].TileYPos;
+                    return PC;
+                }
             }
         }
     }

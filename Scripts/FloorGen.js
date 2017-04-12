@@ -7,16 +7,42 @@
  * Generates the floor tiles in a grid of i x j dimensions. Tiles are intended to be 32x32.
  * @constructor
  */
-function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC) {
+function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gridwidthgap, gridheightgap, GridArr, EnemyArr, ChestArr, scalenum, PC, StairObject, CurrentFloor) {
     /** cellsize -Used to determine the size (in pixels) of the cells
      * gridwidth -Used to determine the width of the grid, later used to orientate the grid to the top and right of the screen*/
 
-    console.log ("Grid size is " + gridwidth);
+    console.log("Grid size is " + gridwidth);
     console.log("Grid width gap is " + gridwidthgap);
     console.log("Grid height gap is " + gridheightgap);
 
     var i;
     var j;
+    var GridReturn;
+
+    /*GridArr = [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+        [7, 8],
+        [9, 10],
+        [11, 12],
+        [13, 14],
+        [15, 16],
+        [17, 18],
+        [19, 20],
+        [21, 22],
+        [23, 24],
+        [25, 26],
+        [27, 28],
+        [29, 30],
+        [31, 32],
+        [33, 34],
+        [35, 36],
+        [37, 38]
+    ];*/
+
+    EnemyArr.length = 0;
+    ChestArr.length = 0;
 
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
@@ -71,15 +97,31 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
         GridArr[i][width - 2].TileType = 0;
     }
     // And define the ways in and out...
-    i = 2 * parseInt((Math.random() *  width / 3), 10) + 1;
-    console.log(parseInt((Math.random() *  width / 3), 10));
-    j = 2 * parseInt((Math.random() *  width / 3), 10) + 1;
-    //Generate Player Spawn Tile if it doesn't exist
-    if (typeof PC === 'undefined') {
-        GridArr[i][1].TileType = 5;
-    }
-    //Generate Staircase tile
-    GridArr[1][j].TileType = 6;
+    var PlayerSpawned = false;
+    var StairsSpawned = false;
+    do {
+        i = 2 * parseInt((Math.random() * width / 3), 10) + 1;
+        console.log(parseInt((Math.random() * width / 3), 10));
+        j = 2 * parseInt((Math.random() * width / 3), 10) + 1;
+        //Generate Player Spawn Tile if it doesn't exist
+        if (PlayerSpawned === false){
+            if (GridArr[i][j].TileType === 0) {
+                console.log("Spawning Player");
+                GridArr[i][j].TileType = 5;
+                PlayerSpawned = true;
+            }
+        }
+        //Generate Staircase tile
+        if (StairsSpawned === false){
+            if (GridArr[i][j].TileType === 0) {
+                console.log("Spawning Staircase");
+                GridArr[i][j].TileType = 6;
+                StairsSpawned = true;
+            }
+        }
+    }while (PlayerSpawned === false || StairsSpawned === false);
+
+    console.log("Escaped the loop with PlayerSpawned " + PlayerSpawned + " and StairsSpawned " + StairsSpawned);
 
     var ChestPool = parseInt((Math.random() *  2), 10) + 3;
     var EnemyPool = parseInt((Math.random() *  5), 10) + 3;
@@ -115,7 +157,7 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
             //GridArr[i][j].TileSprite =
-            MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum, PC, EnemyArr, ChestArr);
+            GridReturn = MakeObject(game, GridArr[i][j], i, j, GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum, PC, EnemyArr, ChestArr, StairObject);
         }
     }
 }
