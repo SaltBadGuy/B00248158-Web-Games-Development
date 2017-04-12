@@ -1,7 +1,7 @@
 {
   "name": "dungeon-haul-v1",
   "description": "package . json for DH",
-  "version": "0.9",
+  "version": "v0.9.0",
   "engines": {
     "node": "6.9.4"  
 }
