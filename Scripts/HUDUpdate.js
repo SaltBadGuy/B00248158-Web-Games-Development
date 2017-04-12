@@ -10,7 +10,7 @@
  * @param CurrentFloor
  * @constructor
  */
-function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
+function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor, HintToDisplay) {
 
     HudText.PCHPText.setText("HP = " + PC.PCCURHP + "/" + PC.PCMAXHP);
 
@@ -39,8 +39,6 @@ function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
     else{
         HudText.PCCurseActive.alpha = 0;
     }
-
-
 
     //Display the stats of your equipment (if they are equipped)
     //Helmet text display
@@ -146,4 +144,6 @@ function UpdateHudElements(game, HudText, PC, enemy, CurrentFloor) {
     }
 
     HudText.FloorNo.setText("Floor " + CurrentFloor);
+
+    HudText.HintText.setText(HintToDisplay);
 }

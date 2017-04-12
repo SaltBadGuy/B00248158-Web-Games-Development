@@ -69,6 +69,7 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
             console.log("Destroying Player");
             Player.pcsprite.destroy();
             game.time.events.removeAll(combatEvent);
+            game.time.events.removeAll(textEvents);
             InCombat.InCombat = false;
         }
         if (Enemy.ENHP <= 0) {
@@ -76,6 +77,7 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
             Player.pcsprite.x += 16;
             Enemy.enemysprite.destroy();
             game.time.events.removeAll(combatEvent);
+            game.time.events.removeAll(textEvents);
             InCombat.InCombat = false;
         }
         if (Player.CursesActive) {
@@ -140,7 +142,7 @@ function CombatTextGen(game, x, y, message, number, Turn, textEvents, Delay){
     Delay.Delay += 200;
     console.log(Delay.Delay);
     textEvents.push(game.time.events.add(Delay.Delay, function (){
-        GenerateText(game, x, y, message, number, Turn, textEvents, Delay)},this
+        GenerateText(game, x, y, message, number, Turn, textEvents, Delay)},game
     ));
 
 }
@@ -167,14 +169,14 @@ function GenerateText(game, x, y, message, number, Turn, textEvents, Delay){
     combatText.align = 'center';
     console.log(textEvents);
     if (y < 288) {
-        game.add.tween(combatText).to({y: 300}, 1500, Phaser.Easing.Linear.none, true);
+        game.add.tween(combatText).to({y: y + 300}, 1500, Phaser.Easing.Linear.none, true);
     }
     else{
-        game.add.tween(combatText).to({y: -300}, 1500, Phaser.Easing.Linear.none, true);
+        game.add.tween(combatText).to({y: y - 300}, 1500, Phaser.Easing.Linear.none, true);
     }
     textEvents.push(game.time.events.add(1000, function (){
         DestroyText(combatText)
-    }, this));
+    }, game));
 }
 
 function DestroyText(combatText){

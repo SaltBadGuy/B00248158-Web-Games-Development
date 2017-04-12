@@ -47,21 +47,21 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentF
     this.PCPotsText = game.add.text((gridwidthgap/3), 150, "Potions: " + PC.PCPots, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center",
+        align: "center"
     });
     this.PCPotsText.anchor.setTo(0.5, 0.5);
 
     this.PCPicksText = game.add.text((gridwidthgap/3) * 2, 150, "Picks: " + PC.PCPicks, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center",
+        align: "center"
     });
     this.PCPicksText.anchor.setTo(0.5, 0.5);
 
     this.PCCursesText = game.add.text((gridwidthgap/2), 180, "Curses: " + PC.PCCurses, {
         font: "18px alphabeta",
         fill: "#00c116",
-        align: "center",
+        align: "center"
     });
     this.PCCursesText.anchor.setTo(0.5, 0.5);
 
@@ -154,5 +154,15 @@ function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentF
     });
     this.TextElement2.alpha = 0;
     this.TextElement2.anchor.set(0.5, 0.5);
-    //this.TextElement2.wordWrap = true;
+
+    //Displays Hints
+    this.HintText = game.add.text((800 - gridwidthgap)/2 + gridwidthgap , 24, "HintText", {
+        font: "16px alphabeta",
+        fill: "#ffffff",
+        //align: "center"
+        //wordWrapWidth: (800 - gridwidthgap)/2 + gridwidthgap,
+        //wordWrap: true
+    });
+    this.HintText.anchor.setTo(0.5, 0.5);
+
 }
