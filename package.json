@@ -1,0 +1,8 @@
+{
+  "name": "Dungeon Haul Package",
+  "description": "package . json for DH",
+  "version": "0.9",
+  "engines": {
+    "node": "6.9.4"  
+}
+}
