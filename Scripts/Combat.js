@@ -2,13 +2,23 @@
  * Created by Callum on 24/02/2017.
  */
 
-
+/**
+ * Combat function, initialises the turn (Player always attacks first) and starts up the WhoAttacks loop
+ * @param game
+ * @param combatEvent
+ * @param textEvents
+ * @param Player
+ * @param Enemy
+ * @param InCombat
+ * @constructor
+ */
 function Combat(game, combatEvent, textEvents, Player, Enemy, InCombat) {
     console.log("Starting Combat!");
     console.log(InCombat);
     console.log(Player);
     console.log(textEvents);
 
+    //Player = true, Enemy = false
     var CombatTurn = {
         Turn: true
     };
@@ -32,7 +42,7 @@ function Combat(game, combatEvent, textEvents, Player, Enemy, InCombat) {
 }
 
 /**
- *
+ * Depending on the turn, either the player or the enemy will attack. If curses are active, combat ends immediately with the enemy dying.
  * @param game
  * @param combatEvent
  * @param Player
@@ -108,6 +118,21 @@ function WhoAttacks(game, combatEvent, textEvents, Player, Enemy, Turn, Burn, In
     }
 }
 
+/**
+ * Attackers heal for a percentage of the damage they're about to deal and then deal their damage as well as apply Burn
+ * @param game
+ * @param P
+ * @param A
+ * @param D
+ * @param AATK
+ * @param DDEF
+ * @param Burn
+ * @param Turn
+ * @param combatEvents
+ * @param textEvents
+ * @param Delay
+ * @constructor
+ */
 function DealDamage(game, P, A, D, AATK, DDEF, Burn, Turn, combatEvents, textEvents, Delay){
     var ActualDamage;
     ActualDamage = P.Parry * (P.Critical * (AATK - DDEF));
@@ -147,6 +172,18 @@ function CombatTextGen(game, x, y, message, number, Turn, textEvents, Delay){
 
 }
 
+/**
+ * Generates a temporary text that floats upwards or downwards, often showing the damage of the attack or showing that a passive is active. Has a known bug with text not clearing sometimes.
+ * @param game
+ * @param x
+ * @param y
+ * @param message
+ * @param number
+ * @param Turn
+ * @param textEvents
+ * @param Delay
+ * @constructor
+ */
 function GenerateText(game, x, y, message, number, Turn, textEvents, Delay){
     var combatTextFont = "25px Alphabeta";
     if (Turn.Turn){
@@ -186,7 +223,7 @@ function DestroyText(combatText){
 
 
 /**
- *
+ *Player Attack Function, if passives are present uses ApplyPassive, otherwise goes to the DealDamage function
  * @param game
  * @param Player
  * @param Enemy
@@ -208,7 +245,7 @@ function PlayerAttack(game, Player, Enemy, Turn, PassiveEffects, Burn, combatEve
 }
 
 /**
- *
+ *Enemy Attack Function, if passives are present uses ApplyPassive, otherwise goes to the DealDamage function
  * @param game
  * @param Player
  * @param Enemy
@@ -229,6 +266,20 @@ function EnemyAttack(game, Player, Enemy, Turn, PassiveEffects, Burn, combatEven
     Turn.Turn = true;
 }
 
+/**
+ * Checks passives and activates them automatically in the case of Burn and Lifesteal and checks RNG to see if Critical and Parry activate
+ * @param game
+ * @param PC
+ * @param Enemy
+ * @param PPassive
+ * @param EPassive
+ * @param PassiveEffects
+ * @param Burn
+ * @param Turn
+ * @param textEvents
+ * @param Delay
+ * @constructor
+ */
 function ApplyPassive(game, PC, Enemy, PPassive, EPassive, PassiveEffects, Burn, Turn, textEvents, Delay) {
     /*When it's the player's turn*/
      if (typeof PPassive === "undefined"){

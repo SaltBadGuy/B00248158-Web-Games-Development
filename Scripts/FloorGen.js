@@ -46,26 +46,20 @@ function GenerateFloor(game, height, width, cellsize, gridwidth, gridheight, gri
 
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
-
-            //GridArr[i][j] = game.add.sprite(16 * i ,16 * j, 'DHFloor');
+            //Generates a basic tile proto to populate the array
             console.log(i + ", " + j);
             GridArr[i][j] = new TileProto(game, gridwidthgap + (cellsize * i), (cellsize * j), 'DHFloor', scalenum);
-            //console.log("GridArr[" + i + "][" + j + "] is " + GridArr[i][j]);
-            //var go = game.add.sprite(160 + (32 * i), 32 * j, 'DHFloor');
-            //GridArr[i][j].TileSprite.scale.setTo(2, 2);
+
         }
     }
+    //Creates a series of bedrock tiles around the perimeter of the map
     for (i = width; i >= 0; i--) {
         for (j = height; j >= 0; j--) {
             GridArr[0][j].TileType = 1;
-            //GridArr[0][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
             GridArr[i][0].TileType = 1;
-            //GridArr[i][0].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs',  scalenum);
             GridArr[width][j].TileType = 1;
-            //GridArr[14][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
             GridArr[i][height].TileType = 1;
-            //GridArr[i][14].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', 'DHChest', 'DHEnemy', 'DHPC', 'DHStairs', scalenum);
-            //GridArr[i][j].TileSprite = MakeObject(game, GridArr[i][j], GridArr[i][j].TileXPos, GridArr[i][j].TileYPos, 'DHFloor', 'DHBedrock', 'DHWall', scalenum);
+
         }
     }
 

@@ -217,7 +217,7 @@
 
             HintDisplay();
 
-            HintsEvents.push(game.time.events.loop(2000, function () {
+            HintsEvents.push(game.time.events.loop(10000, function () {
                 HintDisplay()
             }, this));
 
@@ -389,9 +389,11 @@
                         HudText.TextElement1.alpha = 1;
                         HudText.TextElement2.alpha = 1;
                     }
-                    game.physics.arcade.collide(PC.pcsprite, ChestArr[i].chestsprite, function () {
-                        CheckChest(game, PC, ChestArr[i], HudText, textEvents)
-                    }, null, this);
+                    if (!InCombat.InCombat) {
+                        game.physics.arcade.collide(PC.pcsprite, ChestArr[i].chestsprite, function () {
+                            CheckChest(game, PC, ChestArr[i], HudText, textEvents)
+                        }, null, this);
+                    }
                 }
                 else{
                     ChestArr[i].chestsprite.destroy();
@@ -405,9 +407,11 @@
                 HudText.TextElement2.alpha = 1;
             }
 
-            game.physics.arcade.collide(PC.pcsprite, StairObject.StairSprite, function () {
-                ColliderStairsCall()
-            }, null, this);
+            if (!InCombat.InCombat) {
+                game.physics.arcade.collide(PC.pcsprite, StairObject.StairSprite, function () {
+                    ColliderStairsCall()
+                }, null, this);
+            }
 
             if (!(typeof StairObject.StairSprite === "undefined")) {
                 game.world.bringToTop(StairObject.StairSprite);

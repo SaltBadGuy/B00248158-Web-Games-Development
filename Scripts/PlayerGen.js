@@ -2,6 +2,17 @@
  * Created by Callum on 02/03/2017.
  */
 
+/**
+ * Either creates a whole new player or spawns them at their new intended position on floor generation
+ * @param game
+ * @param PC
+ * @param height
+ * @param width
+ * @param GridArr
+ * @param scalenum
+ * @return {*}
+ * @constructor
+ */
 function SpawnPlayer(game, PC, height, width, GridArr, scalenum) {
     console.log(GridArr);
     console.log(PC);
@@ -28,6 +39,18 @@ function SpawnPlayer(game, PC, height, width, GridArr, scalenum) {
     }
 }
 
+/**
+ * Genereates a new player character
+ * @param game
+ * @param GridArr
+ * @param xpos
+ * @param ypos
+ * @param GridX
+ * @param GridY
+ * @param scalenum
+ * @return {PCCharProto}
+ * @constructor
+ */
 function GeneratePlayer(game, GridArr, xpos, ypos, GridX, GridY, scalenum) {
     this.PCGen = new PCCharProto(game, GridArr, xpos, ypos, GridX, GridY, scalenum);
     this.PCGen.pcsprite.scale.setTo(scalenum, scalenum);

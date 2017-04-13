@@ -2,6 +2,18 @@
  * Created by Callum on 05/03/2017.
  */
 
+/**
+ * Creates the HUD for the game.
+ * @param game
+ * @param PC
+ * @param gridwidthgap
+ * @param gridheightgap
+ * @param EnemyArr
+ * @param CurrentFloor
+ * @param Element1
+ * @param Element2
+ * @constructor
+ */
 function HudInitialize(game, PC, gridwidthgap, gridheightgap, EnemyArr, CurrentFloor, Element1, Element2) {
     console.log(game);
     console.log(PC);
